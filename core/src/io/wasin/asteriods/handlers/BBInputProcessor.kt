@@ -66,11 +66,17 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        if (keycode == Input.Keys.Z) {
-            BBInput.setKey(BBInput.BUTTON1, true)
+        if (keycode == Input.Keys.ENTER) {
+            BBInput.setKey(BBInput.BUTTON_ENTER, true)
         }
-        if (keycode == Input.Keys.X) {
-            BBInput.setKey(BBInput.BUTTON2, true)
+        if (keycode == Input.Keys.ESCAPE) {
+            BBInput.setKey(BBInput.BUTTON_ESCAPE, true)
+        }
+        if (keycode == Input.Keys.SPACE) {
+            BBInput.setKey(BBInput.BUTTON_SPACE, true)
+        }
+        if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
+            BBInput.setKey(BBInput.BUTTON_SHIFT, true)
         }
         if (keycode == Input.Keys.LEFT) {
             BBInput.setKey(BBInput.BUTTON_LEFT, true)
@@ -88,11 +94,17 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        if (keycode == Input.Keys.Z) {
-            BBInput.setKey(BBInput.BUTTON1, false)
+        if (keycode == Input.Keys.ENTER) {
+            BBInput.setKey(BBInput.BUTTON_ENTER, false)
         }
-        if (keycode == Input.Keys.X) {
-            BBInput.setKey(BBInput.BUTTON2, false)
+        if (keycode == Input.Keys.ESCAPE) {
+            BBInput.setKey(BBInput.BUTTON_ESCAPE, false)
+        }
+        if (keycode == Input.Keys.SPACE) {
+            BBInput.setKey(BBInput.BUTTON_SPACE, false)
+        }
+        if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
+            BBInput.setKey(BBInput.BUTTON_SHIFT, false)
         }
         if (keycode == Input.Keys.LEFT) {
             BBInput.setKey(BBInput.BUTTON_LEFT, false)
