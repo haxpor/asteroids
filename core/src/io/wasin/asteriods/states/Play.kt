@@ -10,10 +10,10 @@ import io.wasin.asteriods.handlers.GameStateManager
 class Play(gsm: GameStateManager): GameState(gsm){
 
     override fun handleInput(dt: Float) {
-
     }
 
     override fun update(dt: Float) {
+        handleInput(dt)
     }
 
     override fun render() {
