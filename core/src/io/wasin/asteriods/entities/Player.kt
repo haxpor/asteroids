@@ -16,6 +16,9 @@ class Player: SpaceObject() {
     private var maxSpeed: Float = 0.0f
     private var acceleration: Float = 0.0f
     private var deceleration: Float = 0.0f
+    private var acceleratingTimer: Float = 0.0f
+    private var flamex: Array<Float>
+    private var flamey: Array<Float>
 
     init {
         x = Game.V_WIDTH / 2
@@ -27,6 +30,9 @@ class Player: SpaceObject() {
 
         shapex = Array(4, { 0f })
         shapey = Array(4, { 0f })
+
+        flamex = Array(3, { 0f })
+        flamey = Array(3, { 0f })
 
         radians = (Math.PI / 2f).toFloat()
         rotationSpeed = 3f
@@ -46,6 +52,18 @@ class Player: SpaceObject() {
         shapey[3] = y + MathUtils.sin((radians + 4 * Math.PI / 5f).toFloat()) * 8f
     }
 
+    private fun setFlame() {
+        flamex[0] = x + MathUtils.cos((radians - 5 * Math.PI / 6).toFloat()) * 5f
+        flamey[0] = y + MathUtils.sin((radians - 5 * Math.PI / 6).toFloat()) * 5f
+
+        flamex[1] = x + MathUtils.cos((radians - Math.PI).toFloat()) * (6 + acceleratingTimer * 50)
+        flamey[1] = y + MathUtils.sin((radians - Math.PI).toFloat()) * (6 + acceleratingTimer * 50)
+
+        flamex[2] = x + MathUtils.cos((radians + 5 * Math.PI / 6).toFloat()) * 5f
+        flamey[2] = y + MathUtils.sin((radians + 5 * Math.PI / 6).toFloat()) * 5f
+    }
+
+
     fun update(dt: Float) {
         // turning
         if (left) {
@@ -59,6 +77,14 @@ class Player: SpaceObject() {
         if (up) {
             dx += MathUtils.cos(radians) * acceleration * dt
             dy += MathUtils.sin(radians) * acceleration * dt
+
+            acceleratingTimer += dt
+            if (acceleratingTimer > 0.1f) {
+                acceleratingTimer = 0.0f
+            }
+        }
+        else {
+            acceleratingTimer = 0.0f
         }
 
         // deacceleration
@@ -79,6 +105,11 @@ class Player: SpaceObject() {
         // set shape
         setShape()
 
+        // set flame
+        if (up) {
+            setFlame()
+        }
+
         // screen wrap
         wrap()
     }
@@ -87,8 +118,16 @@ class Player: SpaceObject() {
         sr.color = Color(1f, 1f, 1f, 1f)
         sr.begin(ShapeRenderer.ShapeType.Line)
 
+        // draw ship
         for (i in 0..shapex.size-1) {
             sr.line(shapex[i], shapey[i], shapex[(i+1)%shapex.size], shapey[(i+1)%shapey.size])
+        }
+
+        // draw flame
+        if (up) {
+            for (i in 0..flamex.size - 1) {
+                sr.line(flamex[i], flamey[i], flamex[(i + 1) % flamex.size], flamey[(i + 1) % flamey.size])
+            }
         }
 
         sr.end()
