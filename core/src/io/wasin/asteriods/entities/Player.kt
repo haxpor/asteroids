@@ -29,6 +29,7 @@ class Player: SpaceObject() {
         shapey = Array(4, { 0f })
 
         radians = (Math.PI / 2f).toFloat()
+        rotationSpeed = 3f
     }
 
     private fun setShape() {
@@ -72,8 +73,8 @@ class Player: SpaceObject() {
         }
 
         // set position
-        x += dx
-        y += dy
+        x += dx * dt
+        y += dy * dt
 
         // set shape
         setShape()
