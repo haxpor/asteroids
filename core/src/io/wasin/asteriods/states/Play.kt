@@ -3,6 +3,8 @@ package io.wasin.asteriods.states
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.MathUtils
+import io.wasin.asteriods.Game
 import io.wasin.asteriods.entities.Asteriod
 import io.wasin.asteriods.entities.AsteriodPool
 import io.wasin.asteriods.entities.Player
@@ -14,18 +16,22 @@ import io.wasin.asteriods.handlers.GameStateManager
  */
 class Play(gsm: GameStateManager): GameState(gsm){
 
-    private var sr: ShapeRenderer
-    private var player: Player
+    private var sr: ShapeRenderer = ShapeRenderer()
+    private var player: Player = Player(4)
 
-    private var asteriodPool: AsteriodPool = AsteriodPool(30)
+    lateinit private var asteriodPool: AsteriodPool
     private var asteriods: ArrayList<Asteriod> = ArrayList()
 
+    private var level: Int = 1
+    private var totalAsteriods: Int = 0
+    private var numAsteriodsLeft: Int = 0
+
+    companion object {
+        const val SAFE_SPAWN_DIST: Float = 100f
+    }
+
     init {
-        sr = ShapeRenderer()
-        player = Player(4)
-        asteriods.add(Asteriod(100f, 300f, Asteriod.Type.SMALL))
-        asteriods.add(Asteriod(200f, 250f, Asteriod.Type.MEDIUM))
-        asteriods.add(Asteriod(300f, 350f, Asteriod.Type.LARGE))
+        spawnAsteriods()
     }
 
     override fun handleInput(dt: Float) {
@@ -100,5 +106,36 @@ class Play(gsm: GameStateManager): GameState(gsm){
     }
 
     override fun resize_user(width: Int, height: Int) {
+    }
+
+    private fun spawnAsteriods() {
+        var numToSpawn = level + 3  // aim to spawn only large asteriods
+        totalAsteriods = numToSpawn * 7 // as bigger asteriod can split into 2 asteriod, for all hierarchy for its types
+        numAsteriodsLeft = totalAsteriods
+
+        // create asteriod pool match total number of asteriods to have in such level
+        asteriodPool = AsteriodPool(totalAsteriods)
+
+        var x: Float
+        var y: Float
+
+        // spawn large asteriods outside of the safe area
+        for (n in 1..numToSpawn) {
+            do {
+                x = MathUtils.random(Game.V_WIDTH)
+                y = MathUtils.random(Game.V_HEIGHT)
+
+                val dx = x - player.x
+                val dy = y - player.y
+                val dist = Math.sqrt((dx * dx + dy * dy).toDouble()).toFloat()
+            } while(dist < SAFE_SPAWN_DIST)
+
+            // get free object from the pool
+            val a = asteriodPool.obtain()
+            // spawn
+            a.spawn(x, y, Asteriod.Type.LARGE)
+            // also add into our active list of asteriods
+            asteriods.add(a)
+        }
     }
 }
