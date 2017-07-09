@@ -11,6 +11,7 @@ class Bullet: SpaceObject(), Pool.Poolable {
     private var lifeTime: Float = 0.0f
     private var lifeTimer: Float = 0.0f
     var shouldBeRemoved: Boolean = false
+        private set
 
     companion object {
         const val SPEED: Float = 350f
