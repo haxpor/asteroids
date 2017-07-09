@@ -62,7 +62,22 @@ class Bullet: SpaceObject(), Pool.Poolable {
         }
     }
 
+    /**
+     * Suitable for individual render call on its own.
+     * Thus no need for caller to prepare state or set anything prior to this call to properly
+     * render Bullet.
+     */
     fun render(sr: ShapeRenderer) {
+        sr.begin(ShapeRenderer.ShapeType.Line)
+        sr.circle(x - width/2f, y - height/2f, width.toFloat()/2f)
+        sr.end()
+    }
+
+    /**
+     * Expected caller to set type to begin with ShapeType.Line, thus it can batch rendering
+     * several of Bullet
+     */
+    fun renderBatch(sr: ShapeRenderer) {
         sr.circle(x - width/2f, y - height/2f, width.toFloat()/2f)
     }
 }

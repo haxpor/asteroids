@@ -114,12 +114,11 @@ class Player(maxBullet: Int): SpaceObject() {
             setFlame()
         }
 
-        // update bullet (if not marked as removed yet)
-        bullets.filter { !it.shouldBeRemoved }.map { it.update(dt) }
         // get rid of bullet from active list, and add it to the pool for reuse if necessary
         if (bullets.count() > 0) {
             for (i in bullets.count() - 1 downTo 0) {
                 val b = bullets[i]
+                bullets[i].update(dt)
                 if (b.shouldBeRemoved) {
                     bullets.removeAt(i)
                     bulletsPool.free(b)
@@ -149,7 +148,7 @@ class Player(maxBullet: Int): SpaceObject() {
 
         // draw bullets
         for (bullet in bullets) {
-            bullet.render(sr)
+            bullet.renderBatch(sr)
         }
 
         sr.end()
