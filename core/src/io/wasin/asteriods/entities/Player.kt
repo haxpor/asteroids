@@ -8,7 +8,7 @@ import io.wasin.asteriods.Game
 /**
  * Created by haxpor on 7/9/17.
  */
-class Player: SpaceObject() {
+class Player(maxBullet: Int): SpaceObject() {
     var left: Boolean = false
     var right: Boolean = false
     var up: Boolean = false
@@ -19,6 +19,10 @@ class Player: SpaceObject() {
     private var acceleratingTimer: Float = 0.0f
     private var flamex: Array<Float>
     private var flamey: Array<Float>
+
+    private var maxBullet: Int = maxBullet
+    private var bulletsPool: BulletPool = BulletPool(4)
+    private var bullets: ArrayList<Bullet> = ArrayList()
 
     init {
         x = Game.V_WIDTH / 2
@@ -110,11 +114,24 @@ class Player: SpaceObject() {
             setFlame()
         }
 
+        // update bullet (if not marked as removed yet)
+        bullets.filter { !it.shouldBeRemoved }.map { it.update(dt) }
+        // get rid of bullet from active list, and add it to the pool for reuse if necessary
+        if (bullets.count() > 0) {
+            for (i in bullets.count() - 1 downTo 0) {
+                val b = bullets[i]
+                if (b.shouldBeRemoved) {
+                    bullets.removeAt(i)
+                    bulletsPool.free(b)
+                }
+            }
+        }
+
         // screen wrap
         wrap()
     }
 
-    fun draw(sr: ShapeRenderer) {
+    fun render(sr: ShapeRenderer) {
         sr.color = Color(1f, 1f, 1f, 1f)
         sr.begin(ShapeRenderer.ShapeType.Line)
 
@@ -130,6 +147,22 @@ class Player: SpaceObject() {
             }
         }
 
+        // draw bullets
+        for (bullet in bullets) {
+            bullet.render(sr)
+        }
+
         sr.end()
+    }
+
+    fun shoot() {
+        if (bullets.count() >= maxBullet) return
+
+        // obtain object from the pool
+        val bullet = bulletsPool.obtain()
+        // set position and angle match to what player is of now
+        bullet.spawn(x, y, radians)
+        // add new spawned bullet to bullets list
+        bullets.add(bullet)
     }
 }

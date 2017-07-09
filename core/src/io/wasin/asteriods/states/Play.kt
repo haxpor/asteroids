@@ -17,7 +17,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
     init {
         sr = ShapeRenderer()
-        player = Player()
+        player = Player(4)
     }
 
     override fun handleInput(dt: Float) {
@@ -47,6 +47,11 @@ class Play(gsm: GameStateManager): GameState(gsm){
         else if (!BBInput.isDown(BBInput.BUTTON_UP) && player.up) {
             player.up = false
         }
+
+        // shoot
+        if (BBInput.isPressed(BBInput.BUTTON_SPACE)) {
+            player.shoot()
+        }
     }
 
     override fun update(dt: Float) {
@@ -60,7 +65,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
         Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        player.draw(sr)
+        player.render(sr)
     }
 
     override fun dispose() {
