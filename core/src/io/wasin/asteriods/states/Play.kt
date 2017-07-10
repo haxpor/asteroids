@@ -72,7 +72,14 @@ class Play(gsm: GameStateManager): GameState(gsm){
     override fun update(dt: Float) {
         handleInput(dt)
 
+        // if all asteriods are destroyed then progress to next level
+        if (asteriods.count() == 0) {
+            level++
+            spawnAsteriods()
+        }
+
         player.update(dt)
+        // if player is dead then reset
         if (player.isDead) {
             player.reset()
             return
