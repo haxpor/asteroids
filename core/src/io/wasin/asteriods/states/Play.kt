@@ -75,11 +75,13 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
         for (i in asteriods.count() - 1 downTo 0) {
             val a = asteriods[i]
-            a.update(dt)
 
             if (a.shouldBeRemoved) {
                 asteriods.removeAt(i)
                 asteriodPool.free(a)
+            }
+            else {
+                a.update(dt)
             }
         }
 
@@ -143,6 +145,22 @@ class Play(gsm: GameStateManager): GameState(gsm){
     }
 
     private fun checkCollisions() {
+
+        // player-asteriod collision
+        for (i in asteriods.count()-1 downTo 0) {
+            val asteriod = asteriods[i]
+
+            if (asteriod.shouldBeRemoved) continue
+
+            if (asteriod.intersects(player)) {
+                player.hit()
+                asteriod.shouldBeRemoved = true // mark for it to be removed automatically
+
+                splitAsteriod(asteriod)
+                break
+            }
+        }
+
         // bullet-asteriod collision
         for (i in player.bullets.count()-1 downTo 0) {
             val bullet = player.bullets[i]

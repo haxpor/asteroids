@@ -118,11 +118,13 @@ class Player(maxBullet: Int): SpaceObject() {
         // get rid of bullet from active list, and add it to the pool for reuse if necessary
         for (i in bullets.count() - 1 downTo 0) {
             val b = bullets[i]
-            b.update(dt)
 
             if (b.shouldBeRemoved) {
                 bullets.removeAt(i)
                 bulletsPool.free(b)
+            }
+            else {
+                b.update(dt)
             }
         }
 
@@ -165,5 +167,9 @@ class Player(maxBullet: Int): SpaceObject() {
         bullet.spawn(x, y, radians)
         // add new spawned bullet to bullets list
         bullets.add(bullet)
+    }
+
+    fun hit() {
+
     }
 }
