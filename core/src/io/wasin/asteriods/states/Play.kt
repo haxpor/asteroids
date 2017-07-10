@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import io.wasin.asteriods.Game
-import io.wasin.asteriods.entities.Asteriod
-import io.wasin.asteriods.entities.AsteriodPool
-import io.wasin.asteriods.entities.Player
+import io.wasin.asteriods.entities.*
 import io.wasin.asteriods.handlers.BBInput
 import io.wasin.asteriods.handlers.GameStateManager
 
@@ -21,6 +19,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
     lateinit private var asteriodPool: AsteriodPool
     private var asteriods: ArrayList<Asteriod> = ArrayList()
+
+    private var particlePool: ParticlePool = ParticlePool(20)
+    private var particles: ArrayList<Particle> = ArrayList()
 
     private var level: Int = 1
     private var totalAsteriods: Int = 0
@@ -36,34 +37,34 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
     override fun handleInput(dt: Float) {
         // left button is pressed and player is not going left
-        if (BBInput.isDown(BBInput.BUTTON_LEFT) && !player.left) {
+        if (BBInput.isDown(BBInput.BUTTON_LEFT) && !player.left && !player.isHit) {
             player.left = true
         }
         // left button is pressed and player is not going left
-        else if (!BBInput.isDown(BBInput.BUTTON_LEFT) && player.left) {
+        else if (!BBInput.isDown(BBInput.BUTTON_LEFT) && player.left && !player.isHit) {
             player.left = false
         }
 
         // right button is pressed and player is not going right
-        if (BBInput.isDown(BBInput.BUTTON_RIGHT) && !player.right) {
+        if (BBInput.isDown(BBInput.BUTTON_RIGHT) && !player.right && !player.isHit) {
             player.right = true
         }
         // right button is pressed and player is not going right
-        else if (!BBInput.isDown(BBInput.BUTTON_RIGHT) && player.right) {
+        else if (!BBInput.isDown(BBInput.BUTTON_RIGHT) && player.right && !player.isHit) {
             player.right = false
         }
 
         // up button is pressed and player is not going up
-        if (BBInput.isDown(BBInput.BUTTON_UP) && !player.up) {
+        if (BBInput.isDown(BBInput.BUTTON_UP) && !player.up && !player.isHit) {
             player.up = true
         }
         // up button is pressed and player is not going up
-        else if (!BBInput.isDown(BBInput.BUTTON_UP) && player.up) {
+        else if (!BBInput.isDown(BBInput.BUTTON_UP) && player.up && !player.isHit) {
             player.up = false
         }
 
         // shoot
-        if (BBInput.isPressed(BBInput.BUTTON_SPACE)) {
+        if (BBInput.isPressed(BBInput.BUTTON_SPACE) && !player.isHit) {
             player.shoot()
         }
     }
@@ -71,7 +72,18 @@ class Play(gsm: GameStateManager): GameState(gsm){
     override fun update(dt: Float) {
         handleInput(dt)
 
+        // if all asteriods are destroyed then progress to next level
+        if (asteriods.count() == 0) {
+            level++
+            spawnAsteriods()
+        }
+
         player.update(dt)
+        // if player is dead then reset
+        if (player.isDead) {
+            player.reset()
+            return
+        }
 
         for (i in asteriods.count() - 1 downTo 0) {
             val a = asteriods[i]
@@ -82,6 +94,18 @@ class Play(gsm: GameStateManager): GameState(gsm){
             }
             else {
                 a.update(dt)
+            }
+        }
+
+        for (i in particles.count() - 1 downTo 0) {
+            val p = particles[i]
+
+            if (p.shouldBeRemoved) {
+                particles.removeAt(i)
+                particlePool.free(p)
+            }
+            else {
+                p.update(dt)
             }
         }
 
@@ -101,6 +125,13 @@ class Play(gsm: GameStateManager): GameState(gsm){
         for (asteriod in asteriods) {
             if (!asteriod.shouldBeRemoved) {
                 asteriod.renderBatch(sr)
+            }
+        }
+
+        // batch render for particles
+        for (particle in particles) {
+            if (!particle.shouldBeRemoved) {
+                particle.renderBatch(sr)
             }
         }
         sr.end()
@@ -146,6 +177,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
     private fun checkCollisions() {
 
+        // only check for collision when player is not hit
+        if (player.isHit) return
+
         // player-asteriod collision
         for (i in asteriods.count()-1 downTo 0) {
             val asteriod = asteriods[i]
@@ -188,6 +222,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
     private fun splitAsteriod(asteriod: Asteriod) {
         numAsteriodsLeft--
         if (asteriod.type == Asteriod.Type.LARGE) {
+            // spawn particles
+            createParticles(asteriod.x, asteriod.y, 6)
+
             // split into 2 medium asteriods
             for (n in 1..2) {
                 val newa = asteriodPool.obtain()
@@ -197,6 +234,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
             }
         }
         else if (asteriod.type == Asteriod.Type.MEDIUM) {
+            // spawn particles
+            createParticles(asteriod.x, asteriod.y, 4)
+
             // split into 2 small asteriods
             for (n in 1..2) {
                 val newa = asteriodPool.obtain()
@@ -204,6 +244,18 @@ class Play(gsm: GameStateManager): GameState(gsm){
                 asteriods.add(newa)
                 numAsteriodsLeft++
             }
+        }
+        else if (asteriod.type == Asteriod.Type.SMALL) {
+            // spawn particles
+            createParticles(asteriod.x, asteriod.y, 2)
+        }
+    }
+
+    private fun createParticles(x: Float, y: Float, numSpawned: Int) {
+        for (n in 1..numSpawned) {
+            val particle = particlePool.obtain()
+            particle.spawn(x, y)
+            particles.add(particle)
         }
     }
 }

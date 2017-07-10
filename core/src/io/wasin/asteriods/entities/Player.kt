@@ -4,11 +4,18 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import io.wasin.asteriods.Game
+import java.awt.geom.Line2D
+import java.awt.geom.Point2D
 
 /**
  * Created by haxpor on 7/9/17.
  */
 class Player(maxBullet: Int): SpaceObject() {
+
+    companion object {
+        const val HIT_TIME: Float = 2.0f
+    }
+
     var left: Boolean = false
     var right: Boolean = false
     var up: Boolean = false
@@ -24,6 +31,16 @@ class Player(maxBullet: Int): SpaceObject() {
     private var bulletsPool: BulletPool = BulletPool(4)
     var bullets: ArrayList<Bullet> = ArrayList()
         private set
+
+    var isHit: Boolean = false
+        private set
+    var isDead: Boolean = false
+        private set
+
+    private var hitTimer: Float = 0.0f
+    // TODO: Port this over for mobile compatible, Android will crash
+    private var hitLines: Array<Line2D.Float>? = null
+    private var hitLinesVector: Array<Point2D.Float>? = null
 
     init {
         x = Game.V_WIDTH / 2
@@ -70,81 +87,111 @@ class Player(maxBullet: Int): SpaceObject() {
 
 
     fun update(dt: Float) {
-        // turning
-        if (left) {
-            radians += rotationSpeed * dt
-        }
-        else if (right) {
-            radians -= rotationSpeed * dt
-        }
 
-        // acceleration
-        if (up) {
-            dx += MathUtils.cos(radians) * acceleration * dt
-            dy += MathUtils.sin(radians) * acceleration * dt
+        // if hit then render hitLines
+        if (isHit) {
+            hitTimer += dt
+            if (hitTimer > HIT_TIME) {
+                isDead = true
+                hitTimer = 0.0f
+            }
+            hitLines?.let {
+                val _hitLines = it
 
-            acceleratingTimer += dt
-            if (acceleratingTimer > 0.1f) {
+                _hitLines.forEachIndexed { i, hitLine ->
+                    hitLinesVector?.let {
+                        hitLine.setLine(
+                                _hitLines[i].x1 + it[i].x * 10f * dt,
+                                _hitLines[i].y1 + it[i].y * 10f * dt,
+                                _hitLines[i].x2 + it[i].x * 10f * dt,
+                                _hitLines[i].y2 + it[i].y * 10f * dt)
+                    }
+                }
+            }
+        }
+        // otherwise normally render its compartments
+        else {
+            // turning
+            if (left) {
+                radians += rotationSpeed * dt
+            } else if (right) {
+                radians -= rotationSpeed * dt
+            }
+
+            // acceleration
+            if (up) {
+                dx += MathUtils.cos(radians) * acceleration * dt
+                dy += MathUtils.sin(radians) * acceleration * dt
+
+                acceleratingTimer += dt
+                if (acceleratingTimer > 0.1f) {
+                    acceleratingTimer = 0.0f
+                }
+            } else {
                 acceleratingTimer = 0.0f
             }
-        }
-        else {
-            acceleratingTimer = 0.0f
-        }
 
-        // deacceleration
-        var vec = Math.sqrt((dx * dx + dy * dy).toDouble())
-        if (vec > 0) {
-            dx -= ((dx / vec) * deceleration * dt).toFloat()
-            dy -= ((dy / vec) * deceleration * dt).toFloat()
-        }
-        if (vec > maxSpeed) {
-            dx = ((dx / vec) * maxSpeed).toFloat()
-            dy = ((dy / vec) * maxSpeed).toFloat()
-        }
-
-        // set position
-        x += dx * dt
-        y += dy * dt
-
-        // set shape
-        setShape()
-
-        // set flame
-        if (up) {
-            setFlame()
-        }
-
-        // get rid of bullet from active list, and add it to the pool for reuse if necessary
-        for (i in bullets.count() - 1 downTo 0) {
-            val b = bullets[i]
-
-            if (b.shouldBeRemoved) {
-                bullets.removeAt(i)
-                bulletsPool.free(b)
+            // deacceleration
+            var vec = Math.sqrt((dx * dx + dy * dy).toDouble())
+            if (vec > 0) {
+                dx -= ((dx / vec) * deceleration * dt).toFloat()
+                dy -= ((dy / vec) * deceleration * dt).toFloat()
             }
-            else {
-                b.update(dt)
+            if (vec > maxSpeed) {
+                dx = ((dx / vec) * maxSpeed).toFloat()
+                dy = ((dy / vec) * maxSpeed).toFloat()
             }
-        }
 
-        // screen wrap
-        wrap()
+            // set position
+            x += dx * dt
+            y += dy * dt
+
+            // set shape
+            setShape()
+
+            // set flame
+            if (up) {
+                setFlame()
+            }
+
+            // get rid of bullet from active list, and add it to the pool for reuse if necessary
+            for (i in bullets.count() - 1 downTo 0) {
+                val b = bullets[i]
+
+                if (b.shouldBeRemoved) {
+                    bullets.removeAt(i)
+                    bulletsPool.free(b)
+                } else {
+                    b.update(dt)
+                }
+            }
+
+            // screen wrap
+            wrap()
+        }
     }
 
     fun render(sr: ShapeRenderer) {
         sr.color = Color(1f, 1f, 1f, 1f)
         sr.begin(ShapeRenderer.ShapeType.Line)
 
-        // draw ship
-        for (i in 0..shapex.size-1) {
-            sr.line(shapex[i], shapey[i], shapex[(i+1)%shapex.size], shapey[(i+1)%shapey.size])
+        // if hit
+        if (isHit) {
+            hitLines?.let {
+                it.forEach { sr.line(it.x1, it.y1, it.x2, it.y2) }
+            }
         }
+        else {
+            // draw ship
+            for (i in 0..shapex.size - 1) {
+                sr.line(shapex[i], shapey[i], shapex[(i + 1) % shapex.size], shapey[(i + 1) % shapey.size])
+            }
 
-        // draw flame
-        if (up) {
-            for (i in 0..flamex.size - 1) {
-                sr.line(flamex[i], flamey[i], flamex[(i + 1) % flamex.size], flamey[(i + 1) % flamey.size])
+            // draw flame
+            if (up) {
+                for (i in 0..flamex.size - 1) {
+                    sr.line(flamex[i], flamey[i], flamex[(i + 1) % flamex.size], flamey[(i + 1) % flamey.size])
+                }
             }
         }
 
@@ -170,6 +217,32 @@ class Player(maxBullet: Int): SpaceObject() {
     }
 
     fun hit() {
+        if (isHit) return
 
+        isHit = true
+        dx = 0f
+        dy = 0f
+        left = false
+        right = false
+        up = false
+
+        hitLines = Array(shapex.size, {
+            i ->  Line2D.Float(shapex[i], shapey[i], shapex[(i+1)%shapex.size], shapey[(i+1)%shapey.size])
+        })
+
+        hitLinesVector = arrayOf(
+                Point2D.Float(MathUtils.cos(radians - 1.5f), MathUtils.sin(radians - 1.5f)),
+                Point2D.Float(MathUtils.cos(radians - 2.8f), MathUtils.sin(radians - 2.8f)),
+                Point2D.Float(MathUtils.cos(radians + 2.8f), MathUtils.sin(radians + 2.8f)),
+                Point2D.Float(MathUtils.cos(radians + 1.5f), MathUtils.sin(radians + 1.5f))
+        )
+    }
+
+    fun reset() {
+        x = Game.V_WIDTH / 2
+        y = Game.V_HEIGHT / 2
+        setShape()
+        isHit = false
+        isDead = false
     }
 }
