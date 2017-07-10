@@ -32,8 +32,10 @@ class Player(maxBullet: Int): SpaceObject() {
     var bullets: ArrayList<Bullet> = ArrayList()
         private set
 
-    private var hit: Boolean = false
-    private var dead: Boolean = false
+    var isHit: Boolean = false
+        private set
+    var isDead: Boolean = false
+        private set
 
     private var hitTimer: Float = 0.0f
     // TODO: Port this over for mobile compatible, Android will crash
@@ -87,10 +89,10 @@ class Player(maxBullet: Int): SpaceObject() {
     fun update(dt: Float) {
 
         // if hit then render hitLines
-        if (hit) {
+        if (isHit) {
             hitTimer += dt
             if (hitTimer > HIT_TIME) {
-                dead = true
+                isDead = true
                 hitTimer = 0.0f
             }
             hitLines?.let {
@@ -174,7 +176,7 @@ class Player(maxBullet: Int): SpaceObject() {
         sr.begin(ShapeRenderer.ShapeType.Line)
 
         // if hit
-        if (hit) {
+        if (isHit) {
             hitLines?.let {
                 it.forEach { sr.line(it.x1, it.y1, it.x2, it.y2) }
             }
@@ -215,9 +217,9 @@ class Player(maxBullet: Int): SpaceObject() {
     }
 
     fun hit() {
-        if (hit) return
+        if (isHit) return
 
-        hit = true
+        isHit = true
         dx = 0f
         dy = 0f
         left = false
@@ -234,5 +236,13 @@ class Player(maxBullet: Int): SpaceObject() {
                 Point2D.Float(MathUtils.cos(radians + 2.8f), MathUtils.sin(radians + 2.8f)),
                 Point2D.Float(MathUtils.cos(radians + 1.5f), MathUtils.sin(radians + 1.5f))
         )
+    }
+
+    fun reset() {
+        x = Game.V_WIDTH / 2
+        y = Game.V_HEIGHT / 2
+        setShape()
+        isHit = false
+        isDead = false
     }
 }

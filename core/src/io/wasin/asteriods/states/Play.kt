@@ -36,34 +36,34 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
     override fun handleInput(dt: Float) {
         // left button is pressed and player is not going left
-        if (BBInput.isDown(BBInput.BUTTON_LEFT) && !player.left) {
+        if (BBInput.isDown(BBInput.BUTTON_LEFT) && !player.left && !player.isHit) {
             player.left = true
         }
         // left button is pressed and player is not going left
-        else if (!BBInput.isDown(BBInput.BUTTON_LEFT) && player.left) {
+        else if (!BBInput.isDown(BBInput.BUTTON_LEFT) && player.left && !player.isHit) {
             player.left = false
         }
 
         // right button is pressed and player is not going right
-        if (BBInput.isDown(BBInput.BUTTON_RIGHT) && !player.right) {
+        if (BBInput.isDown(BBInput.BUTTON_RIGHT) && !player.right && !player.isHit) {
             player.right = true
         }
         // right button is pressed and player is not going right
-        else if (!BBInput.isDown(BBInput.BUTTON_RIGHT) && player.right) {
+        else if (!BBInput.isDown(BBInput.BUTTON_RIGHT) && player.right && !player.isHit) {
             player.right = false
         }
 
         // up button is pressed and player is not going up
-        if (BBInput.isDown(BBInput.BUTTON_UP) && !player.up) {
+        if (BBInput.isDown(BBInput.BUTTON_UP) && !player.up && !player.isHit) {
             player.up = true
         }
         // up button is pressed and player is not going up
-        else if (!BBInput.isDown(BBInput.BUTTON_UP) && player.up) {
+        else if (!BBInput.isDown(BBInput.BUTTON_UP) && player.up && !player.isHit) {
             player.up = false
         }
 
         // shoot
-        if (BBInput.isPressed(BBInput.BUTTON_SPACE)) {
+        if (BBInput.isPressed(BBInput.BUTTON_SPACE) && !player.isHit) {
             player.shoot()
         }
     }
@@ -72,6 +72,10 @@ class Play(gsm: GameStateManager): GameState(gsm){
         handleInput(dt)
 
         player.update(dt)
+        if (player.isDead) {
+            player.reset()
+            return
+        }
 
         for (i in asteriods.count() - 1 downTo 0) {
             val a = asteriods[i]
@@ -145,6 +149,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
     }
 
     private fun checkCollisions() {
+
+        // only check for collision when player is not hit
+        if (player.isHit) return
 
         // player-asteriod collision
         for (i in asteriods.count()-1 downTo 0) {
