@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import io.wasin.asteriods.Game
-import io.wasin.asteriods.entities.Asteriod
-import io.wasin.asteriods.entities.AsteriodPool
-import io.wasin.asteriods.entities.Player
+import io.wasin.asteriods.entities.*
 import io.wasin.asteriods.handlers.BBInput
 import io.wasin.asteriods.handlers.GameStateManager
 
@@ -21,6 +19,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
     lateinit private var asteriodPool: AsteriodPool
     private var asteriods: ArrayList<Asteriod> = ArrayList()
+
+    private var particlePool: ParticlePool = ParticlePool(20)
+    private var particles: ArrayList<Particle> = ArrayList()
 
     private var level: Int = 1
     private var totalAsteriods: Int = 0
@@ -89,6 +90,18 @@ class Play(gsm: GameStateManager): GameState(gsm){
             }
         }
 
+        for (i in particles.count() - 1 downTo 0) {
+            val p = particles[i]
+
+            if (p.shouldBeRemoved) {
+                particles.removeAt(i)
+                particlePool.free(p)
+            }
+            else {
+                p.update(dt)
+            }
+        }
+
         checkCollisions()
     }
 
@@ -105,6 +118,13 @@ class Play(gsm: GameStateManager): GameState(gsm){
         for (asteriod in asteriods) {
             if (!asteriod.shouldBeRemoved) {
                 asteriod.renderBatch(sr)
+            }
+        }
+
+        // batch render for particles
+        for (particle in particles) {
+            if (!particle.shouldBeRemoved) {
+                particle.renderBatch(sr)
             }
         }
         sr.end()
@@ -195,6 +215,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
     private fun splitAsteriod(asteriod: Asteriod) {
         numAsteriodsLeft--
         if (asteriod.type == Asteriod.Type.LARGE) {
+            // spawn particles
+            createParticles(asteriod.x, asteriod.y, 6)
+
             // split into 2 medium asteriods
             for (n in 1..2) {
                 val newa = asteriodPool.obtain()
@@ -204,6 +227,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
             }
         }
         else if (asteriod.type == Asteriod.Type.MEDIUM) {
+            // spawn particles
+            createParticles(asteriod.x, asteriod.y, 4)
+
             // split into 2 small asteriods
             for (n in 1..2) {
                 val newa = asteriodPool.obtain()
@@ -211,6 +237,18 @@ class Play(gsm: GameStateManager): GameState(gsm){
                 asteriods.add(newa)
                 numAsteriodsLeft++
             }
+        }
+        else if (asteriod.type == Asteriod.Type.SMALL) {
+            // spawn particles
+            createParticles(asteriod.x, asteriod.y, 2)
+        }
+    }
+
+    private fun createParticles(x: Float, y: Float, numSpawned: Int) {
+        for (n in 1..numSpawned) {
+            val particle = particlePool.obtain()
+            particle.spawn(x, y)
+            particles.add(particle)
         }
     }
 }
