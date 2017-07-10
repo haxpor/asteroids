@@ -73,16 +73,17 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
         player.update(dt)
 
-        if (asteriods.count() > 0) {
-            for (i in asteriods.count()-1 downTo 0) {
-                val a = asteriods[i]
-                a.update(dt)
-                if (a.shouldBeRemoved) {
-                    asteriods.removeAt(i)
-                    asteriodPool.free(a)
-                }
+        for (i in asteriods.count() - 1 downTo 0) {
+            val a = asteriods[i]
+            a.update(dt)
+
+            if (a.shouldBeRemoved) {
+                asteriods.removeAt(i)
+                asteriodPool.free(a)
             }
         }
+
+        checkCollisions()
     }
 
     override fun render() {
@@ -95,8 +96,10 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
         // batch render for asteriods
         sr.begin(ShapeRenderer.ShapeType.Line)
-        for (a in asteriods) {
-            a.renderBatch(sr)
+        for (asteriod in asteriods) {
+            if (!asteriod.shouldBeRemoved) {
+                asteriod.renderBatch(sr)
+            }
         }
         sr.end()
     }
@@ -136,6 +139,53 @@ class Play(gsm: GameStateManager): GameState(gsm){
             a.spawn(x, y, Asteriod.Type.LARGE)
             // also add into our active list of asteriods
             asteriods.add(a)
+        }
+    }
+
+    private fun checkCollisions() {
+        // bullet-asteriod collision
+        for (i in player.bullets.count()-1 downTo 0) {
+            val bullet = player.bullets[i]
+
+            if (bullet.shouldBeRemoved) continue
+
+            for (j in asteriods.count()-1 downTo 0) {
+                val asteriod = asteriods[j]
+
+                if (asteriod.shouldBeRemoved) continue
+
+                if (asteriod.contains(bullet.x, bullet.y)) {
+                    bullet.shouldBeRemoved = true   // mark for it to be removed automatically
+                    asteriod.shouldBeRemoved = true // same
+
+                    // split asteriod
+                    splitAsteriod(asteriod)
+                    // one bullet affects only one asteriod
+                    break
+                }
+            }
+        }
+    }
+
+    private fun splitAsteriod(asteriod: Asteriod) {
+        numAsteriodsLeft--
+        if (asteriod.type == Asteriod.Type.LARGE) {
+            // split into 2 medium asteriods
+            for (n in 1..2) {
+                val newa = asteriodPool.obtain()
+                newa.spawn(asteriod.x, asteriod.y, Asteriod.Type.MEDIUM)
+                asteriods.add(newa)
+                numAsteriodsLeft++
+            }
+        }
+        else if (asteriod.type == Asteriod.Type.MEDIUM) {
+            // split into 2 small asteriods
+            for (n in 1..2) {
+                val newa = asteriodPool.obtain()
+                newa.spawn(asteriod.x, asteriod.y, Asteriod.Type.SMALL)
+                asteriods.add(newa)
+                numAsteriodsLeft++
+            }
         }
     }
 }

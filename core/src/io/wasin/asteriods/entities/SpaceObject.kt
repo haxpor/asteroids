@@ -28,4 +28,18 @@ open class SpaceObject {
         if (y < 0f) y = Game.V_HEIGHT
         if (y > Game.V_HEIGHT) y = 0f
     }
+
+    fun contains(x: Float, y: Float): Boolean {
+        var j = shapex.count() - 1
+        var c = false
+
+        for (i in 0..shapex.count()-1) {
+            if ((shapey[i] > y) != (shapey[j] > y) &&
+                    (x < (shapex[j] - shapex[i]) * (y - shapey[i]) / (shapey[j] - shapey[i]) + shapex[i])) {
+                c = !c
+            }
+            j = i
+        }
+        return c
+    }
 }
