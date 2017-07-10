@@ -22,7 +22,8 @@ class Player(maxBullet: Int): SpaceObject() {
 
     private var maxBullet: Int = maxBullet
     private var bulletsPool: BulletPool = BulletPool(4)
-    private var bullets: ArrayList<Bullet> = ArrayList()
+    var bullets: ArrayList<Bullet> = ArrayList()
+        private set
 
     init {
         x = Game.V_WIDTH / 2
@@ -115,14 +116,15 @@ class Player(maxBullet: Int): SpaceObject() {
         }
 
         // get rid of bullet from active list, and add it to the pool for reuse if necessary
-        if (bullets.count() > 0) {
-            for (i in bullets.count() - 1 downTo 0) {
-                val b = bullets[i]
-                bullets[i].update(dt)
-                if (b.shouldBeRemoved) {
-                    bullets.removeAt(i)
-                    bulletsPool.free(b)
-                }
+        for (i in bullets.count() - 1 downTo 0) {
+            val b = bullets[i]
+
+            if (b.shouldBeRemoved) {
+                bullets.removeAt(i)
+                bulletsPool.free(b)
+            }
+            else {
+                b.update(dt)
             }
         }
 
@@ -148,7 +150,9 @@ class Player(maxBullet: Int): SpaceObject() {
 
         // draw bullets
         for (bullet in bullets) {
-            bullet.renderBatch(sr)
+            if (!bullet.shouldBeRemoved) {
+                bullet.renderBatch(sr)
+            }
         }
 
         sr.end()
@@ -163,5 +167,9 @@ class Player(maxBullet: Int): SpaceObject() {
         bullet.spawn(x, y, radians)
         // add new spawned bullet to bullets list
         bullets.add(bullet)
+    }
+
+    fun hit() {
+
     }
 }

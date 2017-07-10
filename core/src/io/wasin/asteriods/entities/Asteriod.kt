@@ -22,18 +22,12 @@ class Asteriod(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
         private set
 
     private var numPoints: Int = 0
-    private var dists: Array<Float>
+    lateinit private var dists: Array<Float>
     var shouldBeRemoved: Boolean = false
-        private set
 
     constructor(): this(0f, 0f, Type.SMALL) {}
 
     init {
-        // allocate the maximum number of points that can be for all continuous array
-        shapex = Array(MAX_NUMPOINTS, { 0f })
-        shapey = Array(MAX_NUMPOINTS, { 0f })
-        dists = Array(MAX_NUMPOINTS, { 0f })
-
         init(x, y, type)
     }
 
@@ -68,6 +62,10 @@ class Asteriod(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
         dx = MathUtils.cos(radians) * speed
         dy = MathUtils.sin(radians) * speed
 
+        shapex = Array(numPoints, { 0f })
+        shapey = Array(numPoints, { 0f })
+        dists = Array(numPoints, { 0f })
+
         val radius = width / 2f
         for (i in 0..numPoints-1) {
             dists[i] = MathUtils.random(radius / 2f, radius)
@@ -100,9 +98,7 @@ class Asteriod(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
         radians = 0f
         dx = 0f
         dy = 0f
-
-        // no need to clear data for all continuous array
-        // as when it is spawned again, it will initialize only amount that it needs
+        shouldBeRemoved = false
     }
 
     fun update(dt: Float) {

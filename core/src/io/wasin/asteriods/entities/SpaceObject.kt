@@ -28,4 +28,32 @@ open class SpaceObject {
         if (y < 0f) y = Game.V_HEIGHT
         if (y > Game.V_HEIGHT) y = 0f
     }
+
+    fun intersects(other: SpaceObject): Boolean {
+        val otherShapex = other.shapex
+        val otherShapey = other.shapey
+
+        for (i in 0..otherShapex.count()-1) {
+            if (contains(otherShapex[i], otherShapey[i])) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    // see algorithm at https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule
+    fun contains(x: Float, y: Float): Boolean {
+        var j = shapex.count() - 1
+        var c = false
+
+        for (i in 0..shapex.count()-1) {
+            if ((shapey[i] > y) != (shapey[j] > y) &&
+                    (x < (shapex[j] - shapex[i]) * (y - shapey[i]) / (shapey[j] - shapey[i]) + shapex[i])) {
+                c = !c
+            }
+            j = i
+        }
+        return c
+    }
 }
