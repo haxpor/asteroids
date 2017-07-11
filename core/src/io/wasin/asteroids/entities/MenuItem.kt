@@ -1,6 +1,7 @@
 package io.wasin.asteroids.entities
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -12,7 +13,7 @@ import io.wasin.asteroids.handlers.BBInput
 /**
  * Created by haxpor on 7/12/17.
  */
-class MenuItem(x: Float, y: Float, text: String, font: BitmapFont) {
+class MenuItem(x: Float, y: Float, text: String, font: BitmapFont, fontRed: BitmapFont) {
 
     interface Clickable {
         fun onClick(item: MenuItem)
@@ -27,8 +28,10 @@ class MenuItem(x: Float, y: Float, text: String, font: BitmapFont) {
         private set
 
     var listener: Clickable? = null
+    var highlight: Boolean = false
 
     private var font: BitmapFont = font
+    private var fontRed: BitmapFont = fontRed
     private var glyph: GlyphLayout = GlyphLayout(font, text)
     private var boundingRect: Rectangle = Rectangle(x-glyph.width/2f, y-glyph.height/2f, glyph.width, glyph.height)
 
@@ -51,6 +54,11 @@ class MenuItem(x: Float, y: Float, text: String, font: BitmapFont) {
     }
 
     fun render(sb: SpriteBatch) {
-        font.draw(sb, glyph, x - glyph.width/2f, y + glyph.height/2f)
+        if (highlight) {
+            fontRed.draw(sb, glyph, x - glyph.width/2f, y + glyph.height/2f)
+        }
+        else {
+            font.draw(sb, glyph, x - glyph.width / 2f, y + glyph.height / 2f)
+        }
     }
 }

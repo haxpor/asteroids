@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import io.wasin.asteroids.entities.MenuItem
+import io.wasin.asteroids.handlers.BBInput
 import io.wasin.asteroids.handlers.GameStateManager
 
 /**
@@ -17,22 +18,33 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
 
     private val titleFont: BitmapFont
     private val font: BitmapFont
+    private val fontRed: BitmapFont
 
     private val title: String = "Asteroids"
     private val titleGlyph: GlyphLayout
     private var itemTitles: Array<String>
     private val menuItems: Array<MenuItem>
+    private var currentSelectedMenuItem: Int = 0
 
     init {
         val fontGen = FreeTypeFontGenerator(Gdx.files.internal("fonts/Hyperspace Bold.ttf"))
-        val fontParams = FreeTypeFontGenerator.FreeTypeFontParameter()
-        fontParams.size = 56
+
         // title font
-        titleFont = fontGen.generateFont(fontParams)
+        titleFont = fontGen.generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
+            it.size = 56
+        })
 
         // font
-        fontParams.size = 20
-        font = fontGen.generateFont(fontParams)
+        font = fontGen.generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
+            it.size = 20
+        })
+
+        // font red
+        fontRed = fontGen.generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
+            it.size = 20
+            it.color = Color.RED
+        })
+
         // dispose font generator
         fontGen.dispose()
 
@@ -52,13 +64,25 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
 
         // create menuitems
         menuItems = Array(itemTitles.size, {
-            i -> MenuItem(hudCam.viewportWidth/2f, hudCam.viewportHeight/2f-50f*i, itemTitles[i], font)
+            i -> MenuItem(hudCam.viewportWidth/2f, hudCam.viewportHeight/2f-50f*i, itemTitles[i], font, fontRed)
                 .also { it.listener = this }
         })
     }
 
     override fun handleInput(dt: Float) {
+        if (BBInput.isPressed(BBInput.BUTTON_UP)) {
+            currentSelectedMenuItem--
+            if (currentSelectedMenuItem < 0f) {
+                currentSelectedMenuItem = itemTitles.size + currentSelectedMenuItem
+            }
+        }
+        if (BBInput.isPressed(BBInput.BUTTON_DOWN)) {
+            currentSelectedMenuItem = (currentSelectedMenuItem+1) % itemTitles.size
+        }
 
+        if (BBInput.isPressed(BBInput.BUTTON_ENTER)) {
+            select()
+        }
     }
 
     override fun update(dt: Float) {
@@ -79,7 +103,13 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
         titleFont.draw(sb, titleGlyph,
                 hudCam.viewportWidth/2f - titleGlyph.width/2f,
                 hudCam.viewportHeight/2f + titleGlyph.height + 70f)
-        menuItems.forEach { it.render(sb) }
+        menuItems.forEachIndexed { i,
+                                   it -> it.apply {
+                // if current selected menu item matches with menu item then render it with red color
+                it.highlight = i == currentSelectedMenuItem
+                it.render(sb)
+            }
+        }
         sb.end()
     }
 
@@ -92,20 +122,27 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
         menuItems.forEachIndexed { i, menuItem ->  menuItem.setPosition(hudCam.viewportWidth/2f, hudCam.viewportHeight/2f-50f*i) }
     }
 
-    override fun onClick(item: MenuItem) {
-        // we don't do quit on mobile platform
-        if (Gdx.app.type == Application.ApplicationType.iOS ||
-                Gdx.app.type == Application.ApplicationType.Android) {
-            when (item.text) {
-                "Play" -> gsm.setState(Play(gsm))
-                "High Scores" -> println("go to high scrore state")
-            }
+    private fun select() {
+        when(currentSelectedMenuItem) {
+            0 -> gsm.setState(Play(gsm))
+            1 -> println("go to high score state")
+            2 -> Gdx.app.exit()
         }
-        else {
-            when (item.text) {
-                "Play" -> gsm.setState(Play(gsm))
-                "High Scores" -> println("go to high scrore state")
-                "Quit" -> Gdx.app.exit()    // should be used only for desktop
+    }
+
+    override fun onClick(item: MenuItem) {
+        when (item.text) {
+            "Play" -> {
+                currentSelectedMenuItem = 0
+                gsm.setState(Play(gsm))
+            }
+            "High Scores" -> {
+                currentSelectedMenuItem = 1
+                println("go to high scrore state")
+            }
+            "Quit" -> {
+                currentSelectedMenuItem = 2
+                Gdx.app.exit()
             }
         }
     }
