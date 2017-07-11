@@ -18,7 +18,7 @@ android {
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
     defaultConfig {
-        applicationId "io.wasin.asteriods"
+        applicationId "io.wasin.asteroids"
         minSdkVersion 9
         targetSdkVersion 25
         versionCode 1
@@ -79,7 +79,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.wasin.asteriods/io.wasin.asteriods.AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.wasin.asteroids/io.wasin.asteroids.AndroidLauncher'
 }
 
 // sets up the Android Eclipse project, using the old Ant based build.
