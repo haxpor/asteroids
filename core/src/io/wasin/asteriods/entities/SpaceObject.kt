@@ -22,6 +22,11 @@ open class SpaceObject {
     var shapex: Array<Float> = emptyArray()
     var shapey: Array<Float> = emptyArray()
 
+    open fun setPosition(x: Float, y: Float) {
+        this.x = x
+        this.y = y
+    }
+
     fun wrap() {
         if (x < 0f) x = Game.V_WIDTH
         if (x > Game.V_WIDTH) x = 0f
