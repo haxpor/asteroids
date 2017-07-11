@@ -24,8 +24,10 @@ class Asteriod(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
     private var numPoints: Int = 0
     lateinit private var dists: Array<Float>
     var shouldBeRemoved: Boolean = false
+    var score: Int = 0
+        private set
 
-    constructor(): this(0f, 0f, Type.SMALL) {}
+    constructor(): this(0f, 0f, Type.SMALL)
 
     init {
         init(x, y, type)
@@ -42,18 +44,21 @@ class Asteriod(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
                 width = 12
                 height = 12
                 speed = MathUtils.random(70f, 100f)
+                score = 100
             }
             Type.MEDIUM -> {
                 numPoints = 10
                 width = 20
                 height = 20
                 speed = MathUtils.random(50f, 60f)
+                score = 50
             }
             Type.LARGE -> {
                 numPoints = MAX_NUMPOINTS
                 width = 40
                 height = 40
                 speed = MathUtils.random(20f, 30f)
+                score = 20
             }
         }
 
