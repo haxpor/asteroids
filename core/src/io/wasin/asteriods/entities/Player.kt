@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import io.wasin.asteriods.Game
-import java.awt.geom.Line2D
-import java.awt.geom.Point2D
+import io.wasin.asteriods.compat.Line2D
+import io.wasin.asteriods.compat.Point2D
 
 /**
  * Created by haxpor on 7/9/17.
@@ -38,9 +38,9 @@ class Player(maxBullet: Int): SpaceObject() {
         private set
 
     private var hitTimer: Float = 0.0f
-    // TODO: Port this over for mobile compatible, Android will crash
-    private var hitLines: Array<Line2D.Float>? = null
-    private var hitLinesVector: Array<Point2D.Float>? = null
+
+    private var hitLines: Array<Line2D>? = null
+    private var hitLinesVector: Array<Point2D>? = null
 
     init {
         x = Game.V_WIDTH / 2
@@ -227,14 +227,14 @@ class Player(maxBullet: Int): SpaceObject() {
         up = false
 
         hitLines = Array(shapex.size, {
-            i ->  Line2D.Float(shapex[i], shapey[i], shapex[(i+1)%shapex.size], shapey[(i+1)%shapey.size])
+            i ->  Line2D(shapex[i], shapey[i], shapex[(i+1)%shapex.size], shapey[(i+1)%shapey.size])
         })
 
         hitLinesVector = arrayOf(
-                Point2D.Float(MathUtils.cos(radians - 1.5f), MathUtils.sin(radians - 1.5f)),
-                Point2D.Float(MathUtils.cos(radians - 2.8f), MathUtils.sin(radians - 2.8f)),
-                Point2D.Float(MathUtils.cos(radians + 2.8f), MathUtils.sin(radians + 2.8f)),
-                Point2D.Float(MathUtils.cos(radians + 1.5f), MathUtils.sin(radians + 1.5f))
+                Point2D(MathUtils.cos(radians - 1.5f), MathUtils.sin(radians - 1.5f)),
+                Point2D(MathUtils.cos(radians - 2.8f), MathUtils.sin(radians - 2.8f)),
+                Point2D(MathUtils.cos(radians + 2.8f), MathUtils.sin(radians + 2.8f)),
+                Point2D(MathUtils.cos(radians + 1.5f), MathUtils.sin(radians + 1.5f))
         )
     }
 
