@@ -355,7 +355,7 @@
 					"$(inherited)",
 					"${MOE_OTHER_LDFLAGS}",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.wasin.asteriods";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.wasin.asteroids";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_STYLE = "non-global";
 			};
@@ -389,7 +389,7 @@
 					"$(inherited)",
 					"${MOE_OTHER_LDFLAGS}",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.wasin.asteriods";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.wasin.asteroids";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_STYLE = "non-global";
 			};
@@ -513,7 +513,7 @@
 					"${MOE_OTHER_LDFLAGS}",
 					"$(LIBGDX_NATIVES)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.wasin.asteriods";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.wasin.asteroids";
 				PRODUCT_NAME = "asteroids";
 				STRIP_STYLE = "non-global";
 			};
@@ -549,7 +549,7 @@
 					"${MOE_OTHER_LDFLAGS}",
 					"$(LIBGDX_NATIVES)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.wasin.asteriods";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.wasin.asteroids";
 				PRODUCT_NAME = "asteroids";
 				STRIP_STYLE = "non-global";
 			};
