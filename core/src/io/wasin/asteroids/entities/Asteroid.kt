@@ -3,6 +3,7 @@ package io.wasin.asteroids.entities
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Pool
+import com.badlogic.gdx.utils.viewport.Viewport
 
 /**
  * Created by haxpor on 7/10/17.
@@ -106,13 +107,13 @@ class Asteroid(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
         shouldBeRemoved = false
     }
 
-    fun update(dt: Float) {
+    fun update(dt: Float, viewport: Viewport) {
         x += dx * dt
         y += dy * dt
 
         radians += rotationSpeed * dt
         setShape()
-        wrap()
+        wrap(viewport)
     }
 
     fun render(sr: ShapeRenderer) {

@@ -3,6 +3,7 @@ package io.wasin.asteroids.entities
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.utils.viewport.Viewport
 import io.wasin.asteroids.Game
 import io.wasin.asteroids.compat.Line2D
 import io.wasin.asteroids.compat.Point2D
@@ -109,7 +110,7 @@ class Player(maxBullet: Int): SpaceObject() {
     }
 
 
-    fun update(dt: Float) {
+    fun update(dt: Float, viewport: Viewport) {
 
         // if hit then render hitLines
         if (isHit) {
@@ -192,12 +193,12 @@ class Player(maxBullet: Int): SpaceObject() {
                     bullets.removeAt(i)
                     bulletsPool.free(b)
                 } else {
-                    b.update(dt)
+                    b.update(dt, viewport)
                 }
             }
 
             // screen wrap
-            wrap()
+            wrap(viewport)
         }
     }
 

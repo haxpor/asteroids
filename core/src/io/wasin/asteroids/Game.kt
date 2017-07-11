@@ -4,13 +4,13 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import io.wasin.asteroids.handlers.*
 import io.wasin.asteroids.handlers.BBInput
 import io.wasin.asteroids.handlers.BBInputProcessor
 import io.wasin.asteroids.handlers.Content
 import io.wasin.asteroids.handlers.GameStateManager
 import io.wasin.asteroids.handlers.PlayerSaveFileManager
 import io.wasin.asteroids.handlers.Settings
+import io.wasin.asteroids.states.Mainmenu
 import io.wasin.asteroids.states.Play
 
 class Game : ApplicationAdapter() {
@@ -53,17 +53,13 @@ class Game : ApplicationAdapter() {
         res.loadSound("sounds/smallsaucer.ogg", "smallsaucer")
         res.loadSound("sounds/thruster.ogg", "thruster")
 
-        // set to play background music endlessly now
-        // TODO: Play bg music when we have bg music file
-        /*val bgMusic = res.getMusic("bbsong")!!
-        bgMusic.play()
-        bgMusic.isLooping = true*/
 
         // only this time to check for controller
         // if user plug in controller after this then they have to restart the game
         setupFirstActiveController()
 
-        gsm.setState(Play(gsm))
+        // go to main menu state
+        gsm.setState(Mainmenu(gsm))
     }
 
     private fun setupFirstActiveController() {
