@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import io.wasin.asteroids.Game
-import io.wasin.asteroids.entities.*
 import io.wasin.asteroids.entities.Asteroid
 import io.wasin.asteroids.entities.AsteroidPool
 import io.wasin.asteroids.entities.Particle
@@ -15,6 +14,7 @@ import io.wasin.asteroids.entities.ParticlePool
 import io.wasin.asteroids.entities.Player
 import io.wasin.asteroids.handlers.BBInput
 import io.wasin.asteroids.handlers.GameStateManager
+import io.wasin.asteroids.handlers.SimulatedBgMusic
 
 /**
  * Created by haxpor on 6/16/17.
@@ -36,6 +36,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
     private var numAsteroidsLeft: Int = 0
 
     private var font: BitmapFont
+    private var bgMusic: SimulatedBgMusic = SimulatedBgMusic()
 
     companion object {
         const val SAFE_SPAWN_DIST: Float = 100f
@@ -100,6 +101,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
         if (player.isDead) {
             player.reset()
             player.loseLife()
+            bgMusic.reset()
             return
         }
 
@@ -128,6 +130,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
         }
 
         checkCollisions()
+
+        // update bg music; simulated
+        bgMusic.update(dt, !player.isHit)
     }
 
     override fun render() {
@@ -180,6 +185,8 @@ class Play(gsm: GameStateManager): GameState(gsm){
         totalAsteroids = numToSpawn * 7 // as bigger asteroid can split into 2 asteroid, for all hierarchy for its types
         numAsteroidsLeft = totalAsteroids
 
+        bgMusic.updateCurrentDelay(numAsteroidsLeft, totalAsteroids)
+
         // create asteroid pool match total number of asteroids to have in such level
         asteroidPool = AsteroidPool(totalAsteroids)
 
@@ -221,7 +228,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
                 player.hit()
                 asteroid.shouldBeRemoved = true // mark for it to be removed automatically
 
-                splitAsteriod(asteroid)
+                splitAsteroid(asteroid)
 
                 Game.res.getSound("explode")?.let { it.play() }
                 break
@@ -244,7 +251,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
                     asteroid.shouldBeRemoved = true // same
 
                     // split asteroid
-                    splitAsteriod(asteroid)
+                    splitAsteroid(asteroid)
 
                     // increment player score
                     player.incrementScore(asteroid.score.toLong())
@@ -257,8 +264,10 @@ class Play(gsm: GameStateManager): GameState(gsm){
         }
     }
 
-    private fun splitAsteriod(asteroid: Asteroid) {
+    private fun splitAsteroid(asteroid: Asteroid) {
         numAsteroidsLeft--
+        bgMusic.updateCurrentDelay(numAsteroidsLeft, totalAsteroids)
+
         if (asteroid.type == Asteroid.Type.LARGE) {
             // spawn particles
             createParticles(asteroid.x, asteroid.y, 6)
@@ -268,7 +277,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
                 val newa = asteroidPool.obtain()
                 newa.spawn(asteroid.x, asteroid.y, Asteroid.Type.MEDIUM)
                 asteroids.add(newa)
-                numAsteroidsLeft++
+
             }
         }
         else if (asteroid.type == Asteroid.Type.MEDIUM) {
@@ -280,7 +289,6 @@ class Play(gsm: GameStateManager): GameState(gsm){
                 val newa = asteroidPool.obtain()
                 newa.spawn(asteroid.x, asteroid.y, Asteroid.Type.SMALL)
                 asteroids.add(newa)
-                numAsteroidsLeft++
             }
         }
         else if (asteroid.type == Asteroid.Type.SMALL) {

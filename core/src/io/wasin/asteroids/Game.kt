@@ -44,6 +44,14 @@ class Game : ApplicationAdapter() {
 
         // load any resource here...
         res.loadSound("sounds/explode.ogg", "explode")
+        res.loadSound("sounds/extralife.ogg", "extralife")
+        res.loadSound("sounds/largesaucer.ogg", "largesaucer")
+        res.loadSound("sounds/pulsehigh.ogg", "pulsehigh")
+        res.loadSound("sounds/pulselow.ogg", "pulselow")
+        res.loadSound("sounds/saucershoot.ogg", "saucershoot")
+        res.loadSound("sounds/shoot.ogg", "shoot")
+        res.loadSound("sounds/smallsaucer.ogg", "smallsaucer")
+        res.loadSound("sounds/thruster.ogg", "thruster")
 
         // set to play background music endlessly now
         // TODO: Play bg music when we have bg music file

@@ -19,6 +19,20 @@ class Player(maxBullet: Int): SpaceObject() {
     var left: Boolean = false
     var right: Boolean = false
     var up: Boolean = false
+        set(value) {
+            // loop playing sound when it's previously not set
+            // and now it's set
+            if (value && !field) {
+                Game.res.getSound("thruster")?.let { it.loop() }
+            }
+            // stop playing sound when it's previously set
+            // and now it's not set
+            else if (!value && field) {
+                Game.res.getSound("thruster")?.let { it.stop() }
+            }
+
+            field = value
+        }
 
     private var maxSpeed: Float = 0.0f
     private var acceleration: Float = 0.0f
@@ -124,6 +138,7 @@ class Player(maxBullet: Int): SpaceObject() {
             if (score >= requiredScore) {
                 extraLives++
                 requiredScore += 10000
+                Game.res.getSound("extralife")?.let { it.play() }
             }
 
             // turning
@@ -249,6 +264,8 @@ class Player(maxBullet: Int): SpaceObject() {
 
     fun shoot() {
         if (bullets.count() >= maxBullet) return
+
+        Game.res.getSound("shoot")?.let { it.play() }
 
         // obtain object from the pool
         val bullet = bulletsPool.obtain()
