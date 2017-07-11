@@ -38,9 +38,10 @@ class Player(maxBullet: Int): SpaceObject() {
         private set
 
     private var hitTimer: Float = 0.0f
-
     private var hitLines: Array<Line2D>? = null
     private var hitLinesVector: Array<Point2D>? = null
+
+    private var oldShapeRendererColor: Color? = null
 
     var score: Long = 0
         private set
@@ -185,10 +186,39 @@ class Player(maxBullet: Int): SpaceObject() {
         }
     }
 
-    fun render(sr: ShapeRenderer) {
+    /**
+     * Provide flexibility in doing batch render
+     * Call this method before calling renderBatch()
+     */
+    fun beginRender(sr: ShapeRenderer) {
+        // save old color to set it back later when we're done rendering
+        oldShapeRendererColor = sr.color
+
         sr.color = Color(1f, 1f, 1f, 1f)
         sr.begin(ShapeRenderer.ShapeType.Line)
+    }
 
+    /**
+     * Provide flexibility in doing batch render
+     * Call this method after calling renderBatch()
+     */
+    fun endRender(sr: ShapeRenderer) {
+        sr.end()
+
+        // set old color back to shape renderer
+        oldShapeRendererColor?.let { sr.color = it }
+    }
+
+    /**
+     * Full single unit of render
+     */
+    fun render(sr: ShapeRenderer) {
+        beginRender(sr)
+        renderBatch(sr)
+        endRender(sr)
+    }
+
+    fun renderBatch(sr: ShapeRenderer) {
         // if hit
         if (isHit) {
             hitLines?.let {
@@ -215,8 +245,6 @@ class Player(maxBullet: Int): SpaceObject() {
                 bullet.renderBatch(sr)
             }
         }
-
-        sr.end()
     }
 
     fun shoot() {
@@ -266,5 +294,10 @@ class Player(maxBullet: Int): SpaceObject() {
 
     fun incrementScore(l: Long) {
         score += l
+    }
+
+    override fun setPosition(x: Float, y: Float) {
+        super.setPosition(x, y)
+        setShape()
     }
 }

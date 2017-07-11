@@ -18,6 +18,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
     private var sr: ShapeRenderer = ShapeRenderer()
     private var player: Player = Player(4)
+    private var hudPlayer: Player = Player(0)
 
     lateinit private var asteriodPool: AsteriodPool
     private var asteriods: ArrayList<Asteriod> = ArrayList()
@@ -147,6 +148,14 @@ class Play(gsm: GameStateManager): GameState(gsm){
             }
         }
         sr.end()
+
+        // lives
+        hudPlayer.beginRender(sr)
+        for (i in 0..player.extraLives-1) {
+            hudPlayer.setPosition(46f +i*14f, camViewport.screenHeight - 70f)
+            hudPlayer.renderBatch(sr)
+        }
+        hudPlayer.endRender(sr)
 
         // score
         sb.begin()
