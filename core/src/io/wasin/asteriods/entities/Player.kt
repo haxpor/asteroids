@@ -42,6 +42,14 @@ class Player(maxBullet: Int): SpaceObject() {
     private var hitLines: Array<Line2D>? = null
     private var hitLinesVector: Array<Point2D>? = null
 
+    var score: Long = 0
+        private set
+
+    var extraLives: Int = 3
+        private set
+
+    private var requiredScore: Long = 10000
+
     init {
         x = Game.V_WIDTH / 2
         y = Game.V_HEIGHT / 2
@@ -111,6 +119,12 @@ class Player(maxBullet: Int): SpaceObject() {
         }
         // otherwise normally render its compartments
         else {
+            // check extra lives
+            if (score >= requiredScore) {
+                extraLives++
+                requiredScore += 10000
+            }
+
             // turning
             if (left) {
                 radians += rotationSpeed * dt
@@ -244,5 +258,13 @@ class Player(maxBullet: Int): SpaceObject() {
         setShape()
         isHit = false
         isDead = false
+    }
+
+    fun loseLife() {
+        extraLives--
+    }
+
+    fun incrementScore(l: Long) {
+        score += l
     }
 }

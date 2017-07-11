@@ -2,6 +2,8 @@ package io.wasin.asteriods.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import io.wasin.asteriods.Game
@@ -27,11 +29,19 @@ class Play(gsm: GameStateManager): GameState(gsm){
     private var totalAsteriods: Int = 0
     private var numAsteriodsLeft: Int = 0
 
+    private var font: BitmapFont
+
     companion object {
         const val SAFE_SPAWN_DIST: Float = 100f
     }
 
     init {
+        // set font
+        val fontGen = FreeTypeFontGenerator(Gdx.files.internal("fonts/Hyperspace Bold.ttf"))
+        val freeTypeFontParams = FreeTypeFontGenerator.FreeTypeFontParameter()
+        freeTypeFontParams.size = 20
+        font = fontGen.generateFont(freeTypeFontParams)
+
         spawnAsteriods()
     }
 
@@ -79,9 +89,11 @@ class Play(gsm: GameStateManager): GameState(gsm){
         }
 
         player.update(dt)
+
         // if player is dead then reset
         if (player.isDead) {
             player.reset()
+            player.loseLife()
             return
         }
 
@@ -135,6 +147,11 @@ class Play(gsm: GameStateManager): GameState(gsm){
             }
         }
         sr.end()
+
+        // score
+        sb.begin()
+        font.draw(sb, player.score.toString(), 40f, camViewport.screenHeight - 30f)
+        sb.end()
     }
 
     override fun dispose() {
@@ -212,8 +229,11 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
                     // split asteriod
                     splitAsteriod(asteriod)
-                    // one bullet affects only one asteriod
-                    break
+
+                    // increment player score
+                    player.incrementScore(asteriod.score.toLong())
+
+                    break   // one bullet affects only one asteriod
                 }
             }
         }

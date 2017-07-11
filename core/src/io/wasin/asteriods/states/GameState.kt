@@ -66,5 +66,8 @@ abstract class GameState(gsm: GameStateManager) {
     open protected fun setupViewport(cam: OrthographicCamera, hudCam: OrthographicCamera, viewportWidth: Float, viewportHeight: Float) {
         camViewport = ExtendViewport(viewportWidth, viewportHeight, cam)
         hudViewport = ExtendViewport(viewportWidth, viewportHeight, hudCam)
+
+        // apply to use cam viewport
+        camViewport.apply()
     }
 }
