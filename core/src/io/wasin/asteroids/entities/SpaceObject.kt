@@ -1,5 +1,7 @@
 package io.wasin.asteroids.entities
 
+import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.utils.viewport.Viewport
 import io.wasin.asteroids.Game
 
 /**
@@ -27,11 +29,11 @@ open class SpaceObject {
         this.y = y
     }
 
-    fun wrap() {
-        if (x < 0f) x = Game.V_WIDTH
-        if (x > Game.V_WIDTH) x = 0f
-        if (y < 0f) y = Game.V_HEIGHT
-        if (y > Game.V_HEIGHT) y = 0f
+    fun wrap(viewport: Viewport) {
+        if (x < 0f) x = viewport.camera.viewportWidth
+        if (x > viewport.camera.viewportWidth) x = 0f
+        if (y < 0f) y = viewport.camera.viewportHeight
+        if (y > viewport.camera.viewportHeight) y = 0f
     }
 
     fun intersects(other: SpaceObject): Boolean {

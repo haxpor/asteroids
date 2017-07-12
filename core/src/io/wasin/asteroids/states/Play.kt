@@ -48,6 +48,8 @@ class Play(gsm: GameStateManager): GameState(gsm){
         val freeTypeFontParams = FreeTypeFontGenerator.FreeTypeFontParameter()
         freeTypeFontParams.size = 20
         font = fontGen.generateFont(freeTypeFontParams)
+        // dispose font generator
+        fontGen.dispose()
 
         spawnAsteroids()
     }
@@ -95,13 +97,20 @@ class Play(gsm: GameStateManager): GameState(gsm){
             spawnAsteroids()
         }
 
-        player.update(dt)
+        player.update(dt, camViewport)
 
         // if player is dead then reset
         if (player.isDead) {
             player.reset()
             player.loseLife()
             bgMusic.reset()
+
+            // if player has no more extra lives
+            // then go to mainmenu
+            if (player.extraLives < 0) {
+                gsm.setState(Mainmenu(gsm))
+            }
+
             return
         }
 
@@ -113,7 +122,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
                 asteroidPool.free(a)
             }
             else {
-                a.update(dt)
+                a.update(dt, camViewport)
             }
         }
 
@@ -136,6 +145,11 @@ class Play(gsm: GameStateManager): GameState(gsm){
     }
 
     override fun render() {
+        // GAME CONTENT
+        sb.projectionMatrix = cam.combined
+        sr.projectionMatrix = cam.combined
+        camViewport.apply(true)
+
         // clear screen
         Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -159,17 +173,22 @@ class Play(gsm: GameStateManager): GameState(gsm){
         }
         sr.end()
 
+        // UI
+        sb.projectionMatrix = hudCam.combined
+        sr.projectionMatrix = hudCam.combined
+        hudViewport.apply(true)
+
         // lives
         hudPlayer.beginRender(sr)
         for (i in 0..player.extraLives-1) {
-            hudPlayer.setPosition(46f +i*14f, camViewport.screenHeight - 70f)
+            hudPlayer.setPosition(46f +i*14f, hudCam.viewportHeight - 70f)
             hudPlayer.renderBatch(sr)
         }
         hudPlayer.endRender(sr)
 
         // score
         sb.begin()
-        font.draw(sb, player.score.toString(), 40f, camViewport.screenHeight - 30f)
+        font.draw(sb, player.score.toString(), 40f, hudCam.viewportHeight - 30f)
         sb.end()
     }
 

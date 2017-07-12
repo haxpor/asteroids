@@ -27,7 +27,7 @@ abstract class GameState(gsm: GameStateManager) {
         setupCamera(Game.V_WIDTH, Game.V_HEIGHT)
         setupViewport(cam, hudCam, Game.V_WIDTH, Game.V_HEIGHT)
         // always update viewport
-        camViewport.update(Gdx.app.graphics.width, Gdx.app.graphics.height)
+        camViewport.update(Gdx.app.graphics.width, Gdx.app.graphics.height, true)
         hudViewport.update(Gdx.app.graphics.width, Gdx.app.graphics.height, true)
     }
 
@@ -66,8 +66,5 @@ abstract class GameState(gsm: GameStateManager) {
     open protected fun setupViewport(cam: OrthographicCamera, hudCam: OrthographicCamera, viewportWidth: Float, viewportHeight: Float) {
         camViewport = ExtendViewport(viewportWidth, viewportHeight, cam)
         hudViewport = ExtendViewport(viewportWidth, viewportHeight, hudCam)
-
-        // apply to use cam viewport
-        camViewport.apply()
     }
 }
