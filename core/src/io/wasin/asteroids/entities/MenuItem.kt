@@ -13,7 +13,7 @@ import io.wasin.asteroids.handlers.BBInput
 /**
  * Created by haxpor on 7/12/17.
  */
-class MenuItem(x: Float, y: Float, text: String, font: BitmapFont, fontRed: BitmapFont) {
+class MenuItem(x: Float, y: Float, text: String, font: BitmapFont) {
 
     interface Clickable {
         fun onClick(item: MenuItem)
@@ -31,7 +31,6 @@ class MenuItem(x: Float, y: Float, text: String, font: BitmapFont, fontRed: Bitm
     var highlight: Boolean = false
 
     private var font: BitmapFont = font
-    private var fontRed: BitmapFont = fontRed
     private var glyph: GlyphLayout = GlyphLayout(font, text)
     private var boundingRect: Rectangle = Rectangle(x-glyph.width/2f, y-glyph.height/2f, glyph.width, glyph.height)
 
@@ -54,11 +53,14 @@ class MenuItem(x: Float, y: Float, text: String, font: BitmapFont, fontRed: Bitm
     }
 
     fun render(sb: SpriteBatch) {
-        if (highlight) {
-            fontRed.draw(sb, glyph, x - glyph.width/2f, y + glyph.height/2f)
-        }
-        else {
-            font.draw(sb, glyph, x - glyph.width / 2f, y + glyph.height / 2f)
-        }
+        val oldColor = font.color
+
+        // this is a way to dynamically change color of BitmapFont
+        font.color = if (highlight) Color.RED else Color.WHITE
+        glyph.setText(font, text)
+
+        font.draw(sb, glyph, x - glyph.width / 2f, y + glyph.height / 2f)
+
+        font.color = oldColor
     }
 }

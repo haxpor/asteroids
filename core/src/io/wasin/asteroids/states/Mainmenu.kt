@@ -18,10 +18,9 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
 
     private val titleFont: BitmapFont
     private val font: BitmapFont
-    private val fontRed: BitmapFont
 
     private val title: String = "Asteroids"
-    private val titleGlyph: GlyphLayout
+    private var titleGlyph: GlyphLayout
     private var itemTitles: Array<String>
     private val menuItems: Array<MenuItem>
     private var currentSelectedMenuItem: Int = 0
@@ -37,12 +36,6 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
         // font
         font = fontGen.generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
             it.size = 20
-        })
-
-        // font red
-        fontRed = fontGen.generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
-            it.size = 20
-            it.color = Color.RED
         })
 
         // dispose font generator
@@ -64,7 +57,7 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
 
         // create menuitems
         menuItems = Array(itemTitles.size, {
-            i -> MenuItem(hudCam.viewportWidth/2f, hudCam.viewportHeight/2f-50f*i, itemTitles[i], font, fontRed)
+            i -> MenuItem(hudCam.viewportWidth/2f, hudCam.viewportHeight/2f-50f*i, itemTitles[i], font)
                 .also { it.listener = this }
         })
     }
