@@ -7,11 +7,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import io.wasin.asteroids.Game
-import io.wasin.asteroids.entities.Asteroid
-import io.wasin.asteroids.entities.AsteroidPool
-import io.wasin.asteroids.entities.Particle
-import io.wasin.asteroids.entities.ParticlePool
-import io.wasin.asteroids.entities.Player
+import io.wasin.asteroids.entities.*
 import io.wasin.asteroids.handlers.BBInput
 import io.wasin.asteroids.handlers.GameStateManager
 import io.wasin.asteroids.handlers.SimulatedBgMusic
@@ -31,6 +27,11 @@ class Play(gsm: GameStateManager): GameState(gsm){
     private var particlePool: ParticlePool = ParticlePool(20)
     private var particles: ArrayList<Particle> = ArrayList()
 
+    private var flyingSaucerPool: FlyingSaucerPool
+    private var flyingSaucers: ArrayList<FlyingSaucer> = ArrayList()
+    private var flyingSaucerSpawnTimer: Float = 0f
+    private var flyingSaucerSpawnTime: Float = FLYING_SAUCER_SPAWN_COOLDOWN
+
     private var level: Int = 1
     private var totalAsteroids: Int = 0
     private var numAsteroidsLeft: Int = 0
@@ -40,6 +41,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
     companion object {
         const val SAFE_SPAWN_DIST: Float = 100f
+        const val FLYING_SAUCER_SPAWN_COOLDOWN: Float = 15f
     }
 
     init {
@@ -50,6 +52,14 @@ class Play(gsm: GameStateManager): GameState(gsm){
         font = fontGen.generateFont(freeTypeFontParams)
         // dispose font generator
         fontGen.dispose()
+
+        // create pool for asteroids
+        // 70 is pre-determined number of asteriod created in the pool, if player progressed further
+        // than N asteroids, it will dynamically create
+        // this number is pre-determined that user might die before level 10 (mostly)
+        asteroidPool = AsteroidPool(70)
+        // create a pool for flying saucer
+        flyingSaucerPool = FlyingSaucerPool(level, player, camViewport)
 
         spawnAsteroids()
     }
@@ -138,6 +148,38 @@ class Play(gsm: GameStateManager): GameState(gsm){
             }
         }
 
+        // if there's some flying saucers
+        if (flyingSaucers.count() > 0) {
+            for (i in flyingSaucers.count() - 1 downTo 0) {
+                val f = flyingSaucers[i]
+
+                if (f.shouldBeRemoved) {
+                    flyingSaucers.removeAt(i)
+                    flyingSaucerPool.free(f)
+                } else {
+                    f.update(dt)
+                }
+            }
+        }
+        // if there's no flying saucer
+        else {
+            // update flying saucer's spawn timer
+            flyingSaucerSpawnTimer += dt
+            if (flyingSaucerSpawnTimer > flyingSaucerSpawnTime) {
+                flyingSaucerSpawnTimer -= flyingSaucerSpawnTime
+
+                // random type to spawn
+                val fType = if (MathUtils.randomBoolean()) FlyingSaucer.Type.SMALL else FlyingSaucer.Type.LARGE
+                // random direction to spawn
+                val fDir = if (MathUtils.randomBoolean()) FlyingSaucer.Direction.RIGHT else FlyingSaucer.Direction.LEFT
+                // obtain from the pool and spawn
+                val f = flyingSaucerPool.obtain()
+                f.spawn(fType, fDir)
+                // add to active list
+                flyingSaucers.add(f)
+            }
+        }
+
         checkCollisions()
 
         // update bg music; simulated
@@ -173,6 +215,11 @@ class Play(gsm: GameStateManager): GameState(gsm){
         }
         sr.end()
 
+        // flying saucers
+        FlyingSaucer.beginRender(sr)
+        flyingSaucers.forEach { it.renderBatch(sr) }
+        FlyingSaucer.endRender(sr)
+
         // UI
         sb.projectionMatrix = hudCam.combined
         sr.projectionMatrix = hudCam.combined
@@ -207,9 +254,6 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
         bgMusic.updateCurrentDelay(numAsteroidsLeft, totalAsteroids)
 
-        // create asteroid pool match total number of asteroids to have in such level
-        asteroidPool = AsteroidPool(totalAsteroids)
-
         var x: Float
         var y: Float
 
@@ -231,6 +275,14 @@ class Play(gsm: GameStateManager): GameState(gsm){
             // also add into our active list of asteroids
             asteroids.add(a)
         }
+    }
+
+    private fun spawnFlyingSaucers() {
+        // obtain a free object from the pool
+        val f = flyingSaucerPool.obtain()
+        f.spawn(FlyingSaucer.Type.LARGE, FlyingSaucer.Direction.RIGHT)
+        // add to the active list
+        flyingSaucers.add(f)
     }
 
     private fun checkCollisions() {
