@@ -43,7 +43,7 @@ class Player(maxBullet: Int): SpaceObject() {
     private var flamey: Array<Float>
 
     private var maxBullet: Int = maxBullet
-    private var bulletsPool: BulletPool = BulletPool(4)
+    private var bulletsPool: BulletPool = BulletPool(maxBullet)
     var bullets: ArrayList<Bullet> = ArrayList()
         private set
 
