@@ -35,7 +35,7 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
 
         // font
         font = fontGen.generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
-            it.size = 20
+            it.size = 35
         })
 
         // dispose font generator
