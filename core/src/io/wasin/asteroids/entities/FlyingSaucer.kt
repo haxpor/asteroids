@@ -74,7 +74,6 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
     var direction: Direction = dir
         private set
     var shouldBeRemoved: Boolean = false
-        private set
 
     constructor(player: Player, viewport: Viewport): this(player, Type.LARGE, Direction.RIGHT, viewport)
 
@@ -99,11 +98,9 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
 
         if (type == Type.LARGE) {
             score = 200
-            Game.res.getSound("largesaucer")?.loop(0.2f)
         }
         else {
             score = 1000
-            Game.res.getSound("smallsaucer")?.loop(0.2f)
         }
 
         fireTimer = 0f
@@ -119,6 +116,14 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
 
     fun spawn(type: Type, dir: Direction) {
         init(type, dir)
+
+        // play spawn sound effect
+        if (type == Type.LARGE) {
+            Game.res.getSound("largesaucer")?.loop(0.2f)
+        }
+        else if (type == Type.SMALL) {
+            Game.res.getSound("smallsaucer")?.loop(0.2f)
+        }
     }
 
     private fun setShape() {

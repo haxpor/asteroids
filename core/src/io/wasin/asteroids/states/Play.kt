@@ -115,6 +115,11 @@ class Play(gsm: GameStateManager): GameState(gsm){
             player.loseLife()
             bgMusic.reset()
 
+            // mark to remove of flying saucers in next frame
+            flyingSaucers.forEach { it.shouldBeRemoved = true }
+            // reset spawn timer
+            flyingSaucerSpawnTimer = 0f
+
             // if player has no more extra lives
             // then go to mainmenu
             if (player.extraLives < 0) {
