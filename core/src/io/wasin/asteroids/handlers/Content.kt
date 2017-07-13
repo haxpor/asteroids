@@ -4,11 +4,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.utils.Disposable
 
 /**
  * Created by haxpor on 5/17/17.
  */
-class Content {
+class Content: Disposable {
 
     private var textures: HashMap<String, Texture> = HashMap()
     private var sounds: HashMap<String, Sound> = HashMap()
@@ -66,5 +67,12 @@ class Content {
             musics.remove(key)
             m.dispose()
         }
+    }
+
+    override fun dispose() {
+        // remove all resource
+        for (s in textures.keys) { removeTexture(s) }
+
+        // note: no removal of sounds & music, they are automatically handled by libgdx
     }
 }

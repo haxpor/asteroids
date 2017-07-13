@@ -139,7 +139,6 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
         BBInput.controller1Down = true
 
-        // TODO: we fix to use xbox360 layout for mapping here, if *you* have time add configuration for user to map key and let the game use that configuration file
         if (buttonCode == Xbox.B) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_1, true)
         }
@@ -190,7 +189,6 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
         BBInput.controller1Down = false
 
-        // TODO: we fix to use xbox360 layout for mapping here, if *you* have time add configuration for user to map key and let the game use that configuration file
         if (buttonCode == Xbox.B) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_1, false)
         }

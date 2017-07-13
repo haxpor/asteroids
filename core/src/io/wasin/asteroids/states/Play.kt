@@ -193,7 +193,8 @@ class Play(gsm: GameStateManager): GameState(gsm){
     }
 
     override fun dispose() {
-
+        sr.dispose()
+        font.dispose()
     }
 
     override fun resize_user(width: Int, height: Int) {
