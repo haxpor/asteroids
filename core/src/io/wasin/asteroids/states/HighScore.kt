@@ -19,9 +19,6 @@ class HighScore(gsm: GameStateManager): GameState(gsm) {
     private var textFont: BitmapFont
     private var highScoreGlyphs: Array<GlyphLayout>
 
-    lateinit private var highScores: Array<Long>
-    lateinit private var names: Array<String>
-
     init {
         // create font
         val fontGen = FreeTypeFontGenerator(Gdx.files.internal("fonts/Hyperspace Bold.ttf"))
