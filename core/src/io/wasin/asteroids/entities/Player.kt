@@ -132,6 +132,18 @@ class Player(maxBullet: Int): SpaceObject() {
                     }
                 }
             }
+
+            // still update bullets
+            for (i in bullets.count() - 1 downTo 0) {
+                val b = bullets[i]
+
+                if (b.shouldBeRemoved) {
+                    bullets.removeAt(i)
+                    bulletsPool.free(b)
+                } else {
+                    b.update(dt, viewport)
+                }
+            }
         }
         // otherwise normally render its compartments
         else {
