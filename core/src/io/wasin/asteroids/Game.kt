@@ -4,11 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.SerializationException
 import io.wasin.asteroids.handlers.*
-import io.wasin.asteroids.states.GameOver
 import io.wasin.asteroids.states.Mainmenu
-import io.wasin.asteroids.states.Play
 
 class Game : ApplicationAdapter() {
 
@@ -76,6 +73,9 @@ class Game : ApplicationAdapter() {
     }
 
     override fun dispose() {
+        sb.dispose()
+        // clear all resource in resource
+        res.dispose()
     }
 
     override fun resize(width: Int, height: Int) {

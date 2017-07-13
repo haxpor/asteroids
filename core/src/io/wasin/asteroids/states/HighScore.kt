@@ -81,6 +81,7 @@ class HighScore(gsm: GameStateManager): GameState(gsm) {
     }
 
     override fun dispose() {
-
+        titleFont.dispose()
+        textFont.dispose()
     }
 }
