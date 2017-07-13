@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonWriter
 import com.badlogic.gdx.utils.SerializationException
-import io.wasin.asteroids.data.LevelResult
+import io.wasin.asteroids.data.PlayerScore
 import io.wasin.asteroids.data.PlayerSave
 import io.wasin.asteroids.data.PlayerSaveCache
 import io.wasin.asteroids.interfaces.ISaveFile
@@ -94,32 +94,39 @@ class PlayerSaveFileManager(filePath: String): ISaveFile {
     }
 
     /**
-     * Update level result for particular level with LevelResult with an option to write updated
-     * content to the file immediately.
+     * Update with a new player score with an option to write updated content to file immediately.
+     * A new player score will be added into high score records when it has more score than the least score as currently have.
+     * @param playerScore player score to be updated, if condition passed it will be copied and update to highscores
+     * @param writeImmediately true to write to file immediately after updating, otherwise false to not write to file yet
      * @throws GameRuntimeException if cache's data is null
      */
     @Throws(GameRuntimeException::class)
-    fun updateLevelResult(level: Int, levelResult: LevelResult, writeImmediately: Boolean) {
-
+    fun updateWithNewPlayerScore(playerScore: PlayerScore, writeImmediately: Boolean) {
         if (cache.data == null) throw GameRuntimeException("Cache's data should not be null prior to calling this method", GameRuntimeException.NULL_ERROR)
 
-        val l = cache.data!!.levelResults[level - 1]
-        l.score = levelResult.score
+        // check if a new score should be added into the records or not
+        if (playerScore.score > cache.data!!.highScores.last().score) {
+            val highScores = cache.data!!.highScores
 
-        if (writeImmediately) {
-            // write out cached data
-            writeSaveFile(cache.data!!)
+            // copy of input player score
+            highScores[highScores.lastIndex] = playerScore.copy()
+            // re-sort
+            highScores.sortByDescending { it.score }
+
+            if (writeImmediately) {
+                writeSaveFile(cache.data!!)
+            }
         }
     }
 
     /**
-     * Write a fresh save file for specified total number of levels.
+     * Write a fresh save file for specified total number of records.
      * @throws GameRuntimeException if there's any error regarding to I/O operation
      */
-    fun writeFreshSaveFile(totalLevels: Int) {
-        val tmpArray = ArrayList<LevelResult>()
-        for (i in 0..totalLevels-1) {
-            tmpArray.add(LevelResult(0))
+    fun writeFreshSaveFile(numRecords: Int) {
+        val tmpArray = ArrayList<PlayerScore>()
+        for (i in 0..numRecords-1) {
+            tmpArray.add(PlayerScore())
         }
         val data = PlayerSave(tmpArray.toTypedArray())
         writeSaveFile(data)
@@ -129,13 +136,40 @@ class PlayerSaveFileManager(filePath: String): ISaveFile {
     }
 
     /**
-     * Get a copy of level result at specified level.
-     * @return LevelResult if there is such level result available, otherwise return null which might be of null cache, or index out of bound
+     * Return whether cache data is available or not
      */
-    fun getLevelResult(level: Int): LevelResult? {
-        if (cache.data == null) return null
-        if (level > cache.data!!.levelResults.count()) return null
+    fun isCacheDataAvailable(): Boolean {
+        return cache.data != null
+    }
 
-        return cache.data!!.levelResults[level-1].copy()
+    /**
+     * Write save file if cache data is not available, then read it.
+     * @param numRecords number of records to write in case of a need to write a new fresh save file
+     * @param alwaysRead true if always read save file no matter availability of the cache,
+     * false to only when cache is not available. Default to false.
+     * @return player save
+     */
+    fun sync(numRecords: Int, alwaysRead: Boolean=false): PlayerSave {
+        if (!isCacheDataAvailable() || alwaysRead) {
+            try {
+                Gdx.app.log("PlayerSaveFileManager", "read save file")
+                readSaveFile()
+            }
+            catch(e: GameRuntimeException) {
+                if (e.code == GameRuntimeException.SAVE_FILE_NOT_FOUND ||
+                        e.code == GameRuntimeException.SAVE_FILE_EMPTY_CONTENT) {
+
+                    // write a new fresh save file to resolve the issue
+                    Gdx.app.log("PlayerSaveFileManager", "write a fresh save file")
+                    writeFreshSaveFile(numRecords)
+                }
+            }
+            catch(e: SerializationException) {
+                Gdx.app.log("PlayerSaveFileManager", "save file is corrupted, rewrite a fresh one : ${e.message}")
+
+                writeFreshSaveFile(numRecords)
+            }
+        }
+        return cache.data!!
     }
 }

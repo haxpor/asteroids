@@ -35,7 +35,7 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
 
         // font
         font = fontGen.generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
-            it.size = 20
+            it.size = 35
         })
 
         // dispose font generator
@@ -107,7 +107,6 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
     }
 
     override fun dispose() {
-
     }
 
     override fun resize_user(width: Int, height: Int) {
@@ -118,25 +117,26 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
     private fun select() {
         when(currentSelectedMenuItem) {
             0 -> gsm.setState(Play(gsm))
-            1 -> println("go to high score state")
+            1 -> gsm.setState(HighScore(gsm))
             2 -> Gdx.app.exit()
         }
     }
 
     override fun onClick(item: MenuItem) {
+        // set current selected menu item
         when (item.text) {
             "Play" -> {
                 currentSelectedMenuItem = 0
-                gsm.setState(Play(gsm))
             }
             "High Scores" -> {
                 currentSelectedMenuItem = 1
-                println("go to high scrore state")
             }
             "Quit" -> {
                 currentSelectedMenuItem = 2
-                Gdx.app.exit()
             }
         }
+
+        // select
+        select()
     }
 }
