@@ -108,7 +108,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
             // if player has no more extra lives
             // then go to mainmenu
             if (player.extraLives < 0) {
-                gsm.setState(Mainmenu(gsm))
+                gsm.setState(GameOver(player.score, gsm))
             }
 
             return

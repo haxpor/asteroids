@@ -15,10 +15,6 @@ class GameStateManager(game: Game){
         private set
     private var gameStates: Stack<GameState>
 
-    private var isCurrentStateClear: Boolean = false
-    private var currentStateCystalsAmount: Int = 0
-    private var currentMaxCrystalAmount: Int = 0
-
     init {
         this.game = game
         this.gameStates = Stack<GameState>()
@@ -39,7 +35,11 @@ class GameStateManager(game: Game){
     }
 
     fun setState(state: GameState) {
+        // dispose all gamestates first
+        this.gameStates.forEach { it.dispose() }
+        // clear all gamestates
         this.gameStates.clear()
+        // set new one via push
         this.pushState(state)
     }
 
@@ -50,11 +50,5 @@ class GameStateManager(game: Game){
     fun popState() {
         val g = this.gameStates.pop()
         g.dispose()
-    }
-
-    fun setCurrentActiveLevelAsGameOver() {
-        isCurrentStateClear = false
-        currentStateCystalsAmount = 0
-        currentMaxCrystalAmount = 0
     }
 }

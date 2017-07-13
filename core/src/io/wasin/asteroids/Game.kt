@@ -6,6 +6,7 @@ import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.SerializationException
 import io.wasin.asteroids.handlers.*
+import io.wasin.asteroids.states.GameOver
 import io.wasin.asteroids.states.Mainmenu
 import io.wasin.asteroids.states.Play
 

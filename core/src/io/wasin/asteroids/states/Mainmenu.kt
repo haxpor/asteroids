@@ -107,7 +107,6 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
     }
 
     override fun dispose() {
-
     }
 
     override fun resize_user(width: Int, height: Int) {

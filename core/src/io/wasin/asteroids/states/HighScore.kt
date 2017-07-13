@@ -29,6 +29,7 @@ class HighScore(gsm: GameStateManager): GameState(gsm) {
         // - text font
         textFont = fontGen.generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
             it.size = 35
+            it.kerning = false  // we want monospace-like for name
         })
         fontGen.dispose()
 
