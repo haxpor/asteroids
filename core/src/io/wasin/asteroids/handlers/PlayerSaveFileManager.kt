@@ -96,6 +96,8 @@ class PlayerSaveFileManager(filePath: String): ISaveFile {
     /**
      * Update with a new player score with an option to write updated content to file immediately.
      * A new player score will be added into high score records when it has more score than the least score as currently have.
+     * @param playerScore player score to be updated, if condition passed it will be copied and update to highscores
+     * @param writeImmediately true to write to file immediately after updating, otherwise false to not write to file yet
      * @throws GameRuntimeException if cache's data is null
      */
     @Throws(GameRuntimeException::class)
@@ -106,7 +108,8 @@ class PlayerSaveFileManager(filePath: String): ISaveFile {
         if (playerScore.score > cache.data!!.highScores.last().score) {
             val highScores = cache.data!!.highScores
 
-            highScores[highScores.lastIndex] = playerScore
+            // copy of input player score
+            highScores[highScores.lastIndex] = playerScore.copy()
             // re-sort
             highScores.sortByDescending { it.score }
 
