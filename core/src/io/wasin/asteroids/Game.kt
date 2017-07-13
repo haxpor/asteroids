@@ -4,12 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import io.wasin.asteroids.handlers.BBInput
-import io.wasin.asteroids.handlers.BBInputProcessor
-import io.wasin.asteroids.handlers.Content
-import io.wasin.asteroids.handlers.GameStateManager
-import io.wasin.asteroids.handlers.PlayerSaveFileManager
-import io.wasin.asteroids.handlers.Settings
+import com.badlogic.gdx.utils.SerializationException
+import io.wasin.asteroids.handlers.*
 import io.wasin.asteroids.states.Mainmenu
 import io.wasin.asteroids.states.Play
 
@@ -41,6 +37,7 @@ class Game : ApplicationAdapter() {
 
         // create player's savefile manager with pre-set of savefile's path
         playerSaveFileManager = PlayerSaveFileManager(Settings.PLAYER_SAVEFILE_RELATIVE_PATH)
+        playerSaveFileManager.sync(Settings.TOTAL_HIGH_SCORES_RECORD)
 
         // load any resource here...
         res.loadSound("sounds/explode.ogg", "explode")
@@ -52,7 +49,6 @@ class Game : ApplicationAdapter() {
         res.loadSound("sounds/shoot.ogg", "shoot")
         res.loadSound("sounds/smallsaucer.ogg", "smallsaucer")
         res.loadSound("sounds/thruster.ogg", "thruster")
-
 
         // only this time to check for controller
         // if user plug in controller after this then they have to restart the game

@@ -11,5 +11,5 @@ package io.wasin.asteroids.data
  * Thus this will have major effect in production environment
  */
 
-data class LevelResult(var score: Int = 0)
-data class PlayerSave(var levelResults: Array<LevelResult> = emptyArray())
+data class PlayerScore(var name: String="---", var score: Int=0)
+data class PlayerSave(var highScores: Array<PlayerScore> = emptyArray())
