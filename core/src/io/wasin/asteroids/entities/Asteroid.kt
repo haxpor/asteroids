@@ -1,5 +1,6 @@
 package io.wasin.asteroids.entities
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Pool
@@ -15,8 +16,24 @@ class Asteroid(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
         LARGE
     }
 
+    // static context
     companion object {
         const val MAX_NUMPOINTS: Int = 12
+        private var oldShapeRendererColor: Color? = null
+
+        fun beginRender(sr: ShapeRenderer) {
+            // save old color of renderer, we will set it back later
+            oldShapeRendererColor = sr.color
+            sr.color = Color.WHITE
+            sr.begin(ShapeRenderer.ShapeType.Line)
+        }
+
+        fun endRender(sr: ShapeRenderer) {
+            sr.end()
+
+            // set old color back to renderer
+            oldShapeRendererColor?.let { sr.color = it }
+        }
     }
 
     var type: Type = type
@@ -117,11 +134,9 @@ class Asteroid(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
     }
 
     fun render(sr: ShapeRenderer) {
-        sr.begin(ShapeRenderer.ShapeType.Line)
-        for (i in 0..numPoints-1) {
-            sr.line(shapex[i], shapey[i], shapex[(i+1)%numPoints], shapey[(i+1)%numPoints])
-        }
-        sr.end()
+        beginRender(sr)
+        renderBatch(sr)
+        endRender(sr)
     }
 
     fun renderBatch(sr: ShapeRenderer) {
