@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Pool
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.wasin.asteroids.Game
+import io.wasin.asteroids.compat.Line2D
+import io.wasin.asteroids.compat.Point2D
 
 /**
  * Created by haxpor on 7/14/17.
@@ -30,6 +32,9 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
 
     // static context
     companion object {
+        const val HIT_TIME: Float = 2.0f
+        const val NUM_POINT: Int = 6
+
         private var oldShapeRendererColor: Color? = null
 
         fun beginRender(sr: ShapeRenderer) {
@@ -49,11 +54,12 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
 
     private var maxBullet: Int = 1
     private var bulletsPool: BulletPool = BulletPool(maxBullet)
-    private var bullets: ArrayList<Bullet> = ArrayList()
+    var bullets: ArrayList<Bullet> = ArrayList()
+        private set
 
     var type: Type = type
         private set
-    var score: Int = 0
+    var score: Long = 0
         private set
 
     private var fireTimer: Float = 0f
@@ -70,6 +76,30 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
     private var pathTime2: Float = 0f
 
     private var viewport: Viewport = viewport
+
+    /**
+     * Hit animation-line sequence
+     */
+    var isHit: Boolean = false
+        private set
+    private var hitTimer: Float = 0.0f
+    // +2 as mid-line we would like to split it when explodes into 2 lines
+    // the following thows declarations are for caching and better performance not to calculate position
+    // every time FlyingSaucer is destroyed
+    // note: as FlyingSaucer might not get destroyed after it spawned, thus suitable to use lazy in this case
+    private val hitLines: Array<Line2D> by lazyOf(Array(NUM_POINT+2, { Line2D(-1f, -1f, -1f, -1f) }))
+    private val hitLinesVector: Array<Point2D> by lazy {
+        arrayOf(
+                Point2D(MathUtils.cos(MathUtils.degRad * -45f*3f), MathUtils.sin(MathUtils.degRad * -45f*3f)),
+                Point2D(MathUtils.cos(MathUtils.degRad * -45f*2f), MathUtils.sin(MathUtils.degRad * -45f*2f)),
+                Point2D(MathUtils.cos(MathUtils.degRad * -45f), MathUtils.sin(MathUtils.degRad * -45f)),
+                Point2D(MathUtils.cos(MathUtils.degRad * 45f), MathUtils.sin(MathUtils.degRad * 45f)),
+                Point2D(MathUtils.cos(MathUtils.degRad * 45f*2f), MathUtils.sin(MathUtils.degRad * 45f*2f)),
+                Point2D(MathUtils.cos(MathUtils.degRad * 45f*3f), MathUtils.sin(MathUtils.degRad * 45f*3f)),
+                Point2D(-1f, -1f),      // subject to change dynamically
+                Point2D(-1f, -1f)       // subject to change dynamically
+        )
+    }
 
     var direction: Direction = dir
         private set
@@ -110,8 +140,8 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
         pathTime1 = 2f
         pathTime2 = pathTime1  + 2f
 
-        shapex = Array(6, { 0f })
-        shapey = Array(6, { 0f })
+        shapex = Array(NUM_POINT, { 0f })
+        shapey = Array(NUM_POINT, { 0f })
     }
 
     fun spawn(type: Type, dir: Direction) {
@@ -127,6 +157,7 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
     }
 
     private fun setShape() {
+        // the following is counter-clockwise declaration of points
         if (type == Type.LARGE) {
             shapex[0] = x - 10
             shapey[0] = y
@@ -168,73 +199,165 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
     }
 
     fun update(dt: Float) {
-        // fire
-        if (!player.isHit) {
-            fireTimer += dt
+        if (isHit) {
+            hitTimer += dt
+            if (hitTimer > HIT_TIME) {
+                shouldBeRemoved = true
+                hitTimer = 0.0f
+            }
+            hitLines?.let {
+                val _hitLines = it
+                _hitLines.forEachIndexed { i, hitLine ->
+                    hitLinesVector?.let {
+                        // also random speed of exploding line
+                        hitLine.setLine(
+                                _hitLines[i].x1 + it[i].x * MathUtils.random(-10.0f, 30.0f) * dt,
+                                _hitLines[i].y1 + it[i].y * MathUtils.random(-10.0f, 30.0f) * dt,
+                                _hitLines[i].x2 + it[i].x * MathUtils.random(-10.0f, 30.0f) * dt,
+                                _hitLines[i].y2 + it[i].y * MathUtils.random(-10.0f, 30.0f) * dt
+                        )
+                    }
+                }
+            }
 
-            // if time to shoot, and it is inside the screen
-            if (fireTimer > fireTime &&
-                    x > 0f && x < viewport.camera.viewportWidth &&
-                    y > 0f && y < viewport.camera.viewportHeight) {
+            // update bullets
+            for (i in bullets.count() - 1 downTo 0) {
+                val b = bullets[i]
 
-                fireTimer -= fireTime
-                shoot()
+                if (b.shouldBeRemoved) {
+                    bullets.removeAt(i)
+                    bulletsPool.free(b)
+                } else {
+                    b.update(dt, viewport)
+                }
+            }
+        }
+        else {
+            // fire
+            if (!player.isHit) {
+                fireTimer += dt
+
+                // if time to shoot, and it is inside the screen
+                if (fireTimer > fireTime &&
+                        x > 0f && x < viewport.camera.viewportWidth &&
+                        y > 0f && y < viewport.camera.viewportHeight) {
+
+                    fireTimer -= fireTime
+                    shoot()
+                }
+            }
+
+            // move along path
+            pathTimer += dt
+            // move forward
+            if (pathTimer < pathTime1) {
+                dy = 0f
+            }
+
+            // move downward
+            if (pathTimer > pathTime1 && pathTimer < pathTime2) {
+                dy = -speed
+            }
+
+            // move to end of screen
+            if (pathTimer > pathTime1 + pathTime2) {
+                dy = 0f
+            }
+
+            x += dx * dt
+            y += dy * dt
+
+            // screen wrap only for y-direction
+            if (y < 0f) y = viewport.camera.viewportHeight
+
+            // set shape
+            setShape()
+
+            // check if it needs to be removed
+            // and all of its bullets are recycled
+            // that means if flying saucer is out of screen, or destroyed but it shot before that,
+            // bullet can still does damage on player
+            if (((direction == Direction.RIGHT && x > viewport.camera.viewportWidth) ||
+                    (direction == Direction.LEFT && x < 0f)) &&
+                    bullets.count() == 0) {
+                shouldBeRemoved = true
+            }
+
+            // update bullets
+            for (i in bullets.count() - 1 downTo 0) {
+                val b = bullets[i]
+
+                if (b.shouldBeRemoved) {
+                    bullets.removeAt(i)
+                    bulletsPool.free(b)
+                } else {
+                    b.update(dt, viewport)
+                }
+            }
+        }
+    }
+
+    fun render(sr: ShapeRenderer) {
+        beginRender(sr)
+        renderBatch(sr)
+        endRender(sr)
+    }
+
+    fun renderBatch(sr: ShapeRenderer) {
+        // draw exploding structure, or normal depend on isHit flag
+        if (isHit) {
+            hitLines?.let {
+                it.forEach { sr.line(it.x1, it.y1, it.x2, it.y2) }
+            }
+        }
+        else {
+            // render main structure
+            for (i in 0..shapex.size - 1) {
+                sr.line(shapex[i], shapey[i], shapex[(i + 1) % shapex.size], shapey[(i + 1) % shapey.size])
+            }
+            // render line across the structure
+            sr.line(shapex[0], shapey[0], shapex[3], shapey[3])
+        }
+
+        // draw bullets
+        bullets.filter { !it.shouldBeRemoved }.map { it.renderBatch(sr) }
+    }
+
+    fun hit() {
+        // only one hit
+        if (isHit) return
+
+        // mark as hit
+        isHit = true
+
+        // create hit lines, line extract itself from the original line structure
+        // note: initialize also take into account of core mid-line of its structure which reuses its points
+        hitLines.forEachIndexed { i, it ->
+            // for outer lines
+            if (i < shapex.size) {
+                it.setLine(shapex[i], shapey[i], shapex[(i + 1) % shapex.size], shapey[(i + 1) % shapey.size])
+            }
+            // for mid-line, tessellate into 2 sub-line
+            // - 1st sub-line
+            else if (i == shapex.size){
+                it.setLine(shapex[0], shapey[0], (shapex[0] + shapex[3])/2f, shapey[3])
+            }
+            // - 2nd sub-line
+            else {
+                it.setLine((shapex[0] + shapex[3])/2f, shapey[3], shapex[3], shapey[3])
             }
         }
 
-        // move along path
-        pathTimer += dt
-        // move forward
-        if (pathTimer < pathTime1) {
-            dy = 0f
-        }
-
-        // move downward
-        if (pathTimer > pathTime1 && pathTimer < pathTime2) {
-            dy = -speed
-        }
-
-        // move to end of screen
-        if (pathTimer > pathTime1 + pathTime2) {
-            dy = 0f
-        }
-
-        x += dx * dt
-        y += dy * dt
-
-        // screen wrap only for y-direction
-        if (y < 0f) y = viewport.camera.viewportHeight
-
-        // set shape
-        setShape()
-
-        // check if it needs to be removed
-        // and all of its bullets are recycled
-        // that means if flying saucer is out of screen, or destroyed but it shot before that,
-        // bullet can still does damage on player
-        if (((direction == Direction.RIGHT && x > viewport.camera.viewportWidth) ||
-                (direction == Direction.LEFT && x < 0f)) &&
-                bullets.count() == 0) {
-            shouldBeRemoved = true
-        }
-
-        // update bullets
-        for (i in bullets.count() - 1 downTo 0) {
-            val b = bullets[i]
-
-            if (b.shouldBeRemoved) {
-                bullets.removeAt(i)
-                bulletsPool.free(b)
-            } else {
-                b.update(dt, viewport)
-            }
-        }
+        // random direction to move for mid-line (2 sub-lines) in any direction
+        val radiansForMiddleLine = MathUtils.random(MathUtils.PI2)
+        hitLinesVector[hitLinesVector.size-2].set(MathUtils.cos(radiansForMiddleLine), MathUtils.sin(radiansForMiddleLine))
+        hitLinesVector[hitLinesVector.size-1].set(MathUtils.cos(radiansForMiddleLine), MathUtils.sin(radiansForMiddleLine))
     }
 
     fun shoot() {
         if (type == Type.LARGE) {
             // shoot in random direction
-            radians = MathUtils.random((2f * Math.PI).toFloat())
+            radians = MathUtils.random(MathUtils.PI2)
         }
         else if (type == Type.SMALL) {
             // try to shoot to last known position of player
@@ -247,24 +370,6 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
         bullets.add(bullet)
         // play sfx
         Game.res.getSound("saucershoot")?.play()
-    }
-
-    fun render(sr: ShapeRenderer) {
-        beginRender(sr)
-        renderBatch(sr)
-        endRender(sr)
-    }
-
-    fun renderBatch(sr: ShapeRenderer) {
-        // render main structure
-        for (i in 0..shapex.size-1) {
-            sr.line(shapex[i], shapey[i], shapex[(i+1)%shapex.size], shapey[(i+1)%shapey.size])
-        }
-        // render line across the structure
-        sr.line(shapex[0], shapey[0], shapex[3], shapey[3])
-
-        // draw bullets
-        bullets.filter { !it.shouldBeRemoved }.map { it.renderBatch(sr) }
     }
 
     override fun reset() {
@@ -283,6 +388,8 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
         bullets.forEach { bulletsPool.free(it) }
         fireTimer = 0f
         pathTimer = 0f
+        isHit = false
+        hitTimer = 0f
         shouldBeRemoved = false
     }
 }

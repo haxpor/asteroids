@@ -14,4 +14,6 @@ class FlyingSaucerPool(initialCapacity: Int, player: Player, viewport: Viewport)
     override fun newObject(): FlyingSaucer {
         return FlyingSaucer(player, viewport)
     }
+
+
 }

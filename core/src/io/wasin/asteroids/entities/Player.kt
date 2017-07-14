@@ -80,6 +80,7 @@ class Player(maxBullet: Int): SpaceObject() {
         flamex = Array(3, { 0f })
         flamey = Array(3, { 0f })
 
+        // rotate its head to upwards direction
         radians = (Math.PI / 2f).toFloat()
         rotationSpeed = 3f
     }

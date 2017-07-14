@@ -21,7 +21,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
     private var player: Player = Player(4)
     private var hudPlayer: Player = Player(0)
 
-    lateinit private var asteroidPool: AsteroidPool
+    private var asteroidPool: AsteroidPool
     private var asteroids: ArrayList<Asteroid> = ArrayList()
 
     private var particlePool: ParticlePool = ParticlePool(20)
@@ -59,9 +59,11 @@ class Play(gsm: GameStateManager): GameState(gsm){
         // this number is pre-determined that user might die before level 10 (mostly)
         asteroidPool = AsteroidPool(70)
         // create a pool for flying saucer
-        flyingSaucerPool = FlyingSaucerPool(level, player, camViewport)
+        // pre-determined to be only 1 at a time
+        flyingSaucerPool = FlyingSaucerPool(1, player, camViewport)
 
         spawnAsteroids()
+        spawnFlyingSaucers()
     }
 
     override fun handleInput(dt: Float) {
@@ -123,6 +125,10 @@ class Play(gsm: GameStateManager): GameState(gsm){
             // if player has no more extra lives
             // then go to mainmenu
             if (player.extraLives < 0) {
+                // directly stop playing effect sound of flyingsaucer as there's no chance in next frame
+                Game.res.getSound("smallsaucer")?.stop()
+                Game.res.getSound("largesaucer")?.stop()
+
                 gsm.setState(GameOver(player.score, gsm))
             }
 
@@ -336,6 +342,71 @@ class Play(gsm: GameStateManager): GameState(gsm){
                     Game.res.getSound("explode")?.let { it.play() }
 
                     break   // one bullet affects only one asteroid
+                }
+            }
+        }
+
+        // player-flyingsaucer collision
+        for (f in flyingSaucers) {
+            if (f.shouldBeRemoved || f.isHit) continue          // skip if need to be removed, or already hit
+
+            if (f.intersects(player)) {
+                player.hit()
+                createParticles(player.x, player.y, 3)
+                createParticles(f.x, f.y, 3)
+                // flying saucer takes hit, and marked for removal
+                // no need to mark as remove, hit() will handle it
+                f.hit()
+                Game.res.getSound("explode")?.play()
+            }
+        }
+
+        // player-flyingsaucer's bullets collision
+        for (i in 0..flyingSaucers.count()-1) {
+            val f = flyingSaucers[i]
+            if (f.shouldBeRemoved || f.isHit) continue             // skip if need to be removed, or already hit
+
+            val fBullets = f.bullets
+            for (j in 0..fBullets.count()-1) {
+                val bullet = fBullets[j]
+                if (bullet.shouldBeRemoved) continue    // skip if need to be removed
+
+                if (player.contains(bullet.x, bullet.y)) {
+                    // mark removal for bullet
+                    bullet.shouldBeRemoved = true
+                    // player takes hit
+                    player.hit()
+                    // create particle
+                    createParticles(player.x, player.y, 3)
+                    // play sound effect
+                    Game.res.getSound("explode")?.play()
+                    break
+                }
+            }
+        }
+
+        // player's bullets-flyingsaucer
+        for (i in 0..player.bullets.count()-1) {
+            val bullet = player.bullets[i]
+            if (bullet.shouldBeRemoved) continue    // skip if needs to be removed
+
+            for (j in 0..flyingSaucers.count()-1) {
+                val f = flyingSaucers[j]
+                if (f.shouldBeRemoved || f.isHit) continue     // skip if needs to be removed, or already hit
+
+                if (f.contains(bullet.x, bullet.y)) {
+                    // mark removal for bullet
+                    bullet.shouldBeRemoved = true
+                    // player gains point
+                    player.incrementScore(f.score)
+                    // flying saucer takes hit, and marked for removal
+                    // no need to mark as remove, hit() will handle it
+                    f.hit()
+                    // create particle depends on type
+                    createParticles(f.x, f.y, if (f.type == FlyingSaucer.Type.LARGE) 6 else 3)
+                    // play sound effect
+                    Game.res.getSound("explode")?.play()
+                    break
                 }
             }
         }
