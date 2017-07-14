@@ -43,7 +43,7 @@ class Player(maxBullet: Int): SpaceObject() {
     private var flamey: Array<Float>
 
     private var maxBullet: Int = maxBullet
-    private var bulletsPool: BulletPool = BulletPool(4)
+    private var bulletsPool: BulletPool = BulletPool(maxBullet)
     var bullets: ArrayList<Bullet> = ArrayList()
         private set
 
@@ -80,6 +80,7 @@ class Player(maxBullet: Int): SpaceObject() {
         flamex = Array(3, { 0f })
         flamey = Array(3, { 0f })
 
+        // rotate its head to upwards direction
         radians = (Math.PI / 2f).toFloat()
         rotationSpeed = 3f
     }

@@ -25,7 +25,7 @@ class Asteroid(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
     private var numPoints: Int = 0
     lateinit private var dists: Array<Float>
     var shouldBeRemoved: Boolean = false
-    var score: Int = 0
+    var score: Long = 0
         private set
 
     constructor(): this(0f, 0f, Type.SMALL)

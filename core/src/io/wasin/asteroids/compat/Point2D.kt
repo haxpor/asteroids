@@ -9,4 +9,10 @@ package io.wasin.asteroids.compat
  * It doesn't provide similar functionality of original class.
  *
  */
-data class Point2D(var x: Float = 0f, var y: Float = 0f)
+data class Point2D(var x: Float = 0f, var y: Float = 0f) {
+
+    fun set(x: Float, y: Float) {
+        this.x = x
+        this.y = y
+    }
+}
