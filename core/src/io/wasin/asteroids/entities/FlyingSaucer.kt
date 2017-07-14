@@ -327,6 +327,14 @@ class FlyingSaucer(player: Player, type: Type, dir: Direction, viewport: Viewpor
         // only one hit
         if (isHit) return
 
+        // stop sound
+        if (type == Type.SMALL) {
+            Game.res.getSound("smallsaucer")?.stop()
+        }
+        else if (type == Type.LARGE) {
+            Game.res.getSound("largesaucer")?.stop()
+        }
+
         // mark as hit
         isHit = true
 

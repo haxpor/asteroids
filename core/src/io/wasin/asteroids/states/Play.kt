@@ -313,7 +313,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
                 splitAsteroid(asteroid)
 
-                Game.res.getSound("explode")?.let { it.play() }
+                Game.res.getSound("explode")?.play()
                 break
             }
         }
@@ -339,7 +339,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
                     // increment player score
                     player.incrementScore(asteroid.score.toLong())
 
-                    Game.res.getSound("explode")?.let { it.play() }
+                    Game.res.getSound("explode")?.play()
 
                     break   // one bullet affects only one asteroid
                 }
@@ -363,10 +363,10 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
         // player-flyingsaucer's bullets collision
         for (i in 0..flyingSaucers.count()-1) {
-            val f = flyingSaucers[i]
-            if (f.shouldBeRemoved || f.isHit) continue             // skip if need to be removed, or already hit
+            // even flying saucer is hit but if it's not removed from active list yet
+            // then its bullets are still in effect
+            val fBullets = flyingSaucers[i].bullets
 
-            val fBullets = f.bullets
             for (j in 0..fBullets.count()-1) {
                 val bullet = fBullets[j]
                 if (bullet.shouldBeRemoved) continue    // skip if need to be removed
@@ -407,6 +407,58 @@ class Play(gsm: GameStateManager): GameState(gsm){
                     // play sound effect
                     Game.res.getSound("explode")?.play()
                     break
+                }
+            }
+        }
+
+        // flying saucers - asteroids
+        for (i in 0..flyingSaucers.count()-1) {
+            var f = flyingSaucers[i]
+            if (f.shouldBeRemoved || f.isHit) continue      // skip if needs to be removed, or already hit
+
+            for (j in 0..asteroids.count()-1) {
+                val asteroid = asteroids[j]
+                if (asteroid.shouldBeRemoved)   continue    // skip if needs to be removed
+
+                if (f.intersects(asteroid)) {
+                    // mark removal for asteroid
+                    asteroid.shouldBeRemoved = true
+                    splitAsteroid(asteroid)
+
+                    // create particle for flying saucers
+                    createParticles(f.x, f.y, if (f.type == FlyingSaucer.Type.LARGE) 6 else 3)
+                    // make flying saucer hit
+                    f.hit()
+
+                    Game.res.getSound("explode")?.play()
+                    break
+                }
+            }
+        }
+
+        // flying saucers' bullets - asteroids
+        for (i in 0..flyingSaucers.count()-1) {
+            // even flying saucer is hit but if it's not removed from active list yet
+            // then its bullets are still in effect
+            val fBullets = flyingSaucers[i].bullets
+
+            for (j in 0..fBullets.count()-1) {
+                val bullet = fBullets[j]
+                if (bullet.shouldBeRemoved) continue            // skip if need to be removed
+
+                for (k in 0..asteroids.count()-1) {
+                    val asteroid = asteroids[k]
+                    if (asteroid.shouldBeRemoved) continue       // skip if need to be removed
+
+                    if (asteroid.contains(bullet.x, bullet.y)) {
+                        // mark removal for asteroid
+                        asteroid.shouldBeRemoved = true
+                        splitAsteroid(asteroid)
+
+                        // play sound effect
+                        Game.res.getSound("explode")?.play()
+                        break
+                    }
                 }
             }
         }
