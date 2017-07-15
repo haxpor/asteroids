@@ -1,5 +1,6 @@
 package io.wasin.asteroids.handlers
 
+import com.badlogic.gdx.utils.Disposable
 import io.wasin.asteroids.Game
 import io.wasin.asteroids.states.*
 import io.wasin.asteroids.states.GameState
@@ -10,7 +11,7 @@ import java.util.Stack
  * Created by haxpor on 5/14/17.
  */
 
-class GameStateManager(game: Game){
+class GameStateManager(game: Game): Disposable {
     var game: Game
         private set
     private var gameStates: Stack<GameState>
@@ -50,5 +51,9 @@ class GameStateManager(game: Game){
     fun popState() {
         val g = this.gameStates.pop()
         g.dispose()
+    }
+
+    override fun dispose() {
+        gameStates.forEach { it.dispose() }
     }
 }
