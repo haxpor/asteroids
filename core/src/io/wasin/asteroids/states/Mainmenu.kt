@@ -108,9 +108,9 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         // render all asteroids in the back
-        Asteroid.beginRender(sr)
+        Asteroid.beginBatchRender(sr)
         asteroids.forEach { it.renderBatch(sr) }
-        Asteroid.endRender(sr)
+        Asteroid.endBatchRender(sr)
 
 
         // render UI

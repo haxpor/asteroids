@@ -210,18 +210,18 @@ class Play(gsm: GameStateManager): GameState(gsm){
         player.render(sr)
 
         // batch render for asteroids
-        Asteroid.beginRender(sr)
+        Asteroid.beginBatchRender(sr)
         asteroids.forEach {
             if (!it.shouldBeRemoved) { it.renderBatch(sr) }
         }
-        Asteroid.endRender(sr)
+        Asteroid.endBatchRender(sr)
 
         // batch render for particles
-        Particle.beginRender(sr)
+        Particle.beginBatchRender(sr)
         particles.forEach {
             if (!it.shouldBeRemoved) { it.renderBatch(sr) }
         }
-        Particle.endRender(sr)
+        Particle.endBatchRender(sr)
 
         // flying saucers
         FlyingSaucer.beginRender(sr)
@@ -234,12 +234,12 @@ class Play(gsm: GameStateManager): GameState(gsm){
         hudViewport.apply(true)
 
         // lives
-        hudPlayer.beginRender(sr)
+        Player.beginBatchRender(sr)
         for (i in 0..player.extraLives-1) {
             hudPlayer.setPosition(46f +i*14f, hudCam.viewportHeight - 70f)
             hudPlayer.renderBatch(sr)
         }
-        hudPlayer.endRender(sr)
+        Player.endBatchRender(sr)
 
         // score
         sb.begin()
