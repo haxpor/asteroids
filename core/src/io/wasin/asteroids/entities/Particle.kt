@@ -1,5 +1,6 @@
 package io.wasin.asteroids.entities
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Pool
@@ -12,6 +13,25 @@ class Particle(x: Float, y: Float): SpaceObject(), Pool.Poolable {
     private var time: Float = 1.0f
     var shouldBeRemoved: Boolean = false
         private set
+
+    // static context
+    companion object {
+        private var oldShapeRendererColor: Color? = null
+
+        fun beginRender(sr: ShapeRenderer) {
+            // save old color of renderer, we will set it back later
+            oldShapeRendererColor = sr.color
+            sr.color = Color.WHITE
+            sr.begin(ShapeRenderer.ShapeType.Line)
+        }
+
+        fun endRender(sr: ShapeRenderer) {
+            sr.end()
+
+            // set old color back to renderer
+            oldShapeRendererColor?.let { sr.color = it }
+        }
+    }
 
     constructor(): this(0f, 0f)
 
@@ -48,9 +68,9 @@ class Particle(x: Float, y: Float): SpaceObject(), Pool.Poolable {
     }
 
     fun render(sr: ShapeRenderer) {
-        sr.begin(ShapeRenderer.ShapeType.Line)
-        sr.circle(x - width / 2f, y - height / 2f, width / 2f)
-        sr.end()
+        beginRender(sr)
+        renderBatch(sr)
+        endRender(sr)
     }
 
     fun renderBatch(sr: ShapeRenderer) {

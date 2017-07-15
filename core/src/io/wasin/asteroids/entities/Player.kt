@@ -269,10 +269,8 @@ class Player(maxBullet: Int): SpaceObject() {
         }
 
         // draw bullets
-        for (bullet in bullets) {
-            if (!bullet.shouldBeRemoved) {
-                bullet.renderBatch(sr)
-            }
+        bullets.forEach {
+            if (!it.shouldBeRemoved) { it.renderBatch(sr) }
         }
     }
 
