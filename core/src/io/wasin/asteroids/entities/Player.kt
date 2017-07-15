@@ -7,14 +7,32 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import io.wasin.asteroids.Game
 import io.wasin.asteroids.compat.Line2D
 import io.wasin.asteroids.compat.Point2D
+import io.wasin.asteroids.interfaces.IBatchShapeRenderable
+import io.wasin.asteroids.interfaces.IBatchWrapperShapeRenderable
 
 /**
  * Created by haxpor on 7/9/17.
  */
-class Player(maxBullet: Int): SpaceObject() {
+class Player(maxBullet: Int): SpaceObject(), IBatchShapeRenderable {
 
-    companion object {
+    companion object: IBatchWrapperShapeRenderable {
         const val HIT_TIME: Float = 2.0f
+
+        private var oldShapeRendererColor: Color? = null
+
+        override fun beginBatchRender(sr: ShapeRenderer) {
+            // save old color of renderer, we will set it back later
+            oldShapeRendererColor = sr.color
+            sr.color = Color.WHITE
+            sr.begin(ShapeRenderer.ShapeType.Line)
+        }
+
+        override fun endBatchRender(sr: ShapeRenderer) {
+            sr.end()
+
+            // set old color back to renderer
+            oldShapeRendererColor?.let { sr.color = it }
+        }
     }
 
     var left: Boolean = false
@@ -55,8 +73,6 @@ class Player(maxBullet: Int): SpaceObject() {
     private var hitTimer: Float = 0.0f
     private var hitLines: Array<Line2D>? = null
     private var hitLinesVector: Array<Point2D>? = null
-
-    private var oldShapeRendererColor: Color? = null
 
     var score: Long = 0
         private set
@@ -216,38 +232,15 @@ class Player(maxBullet: Int): SpaceObject() {
     }
 
     /**
-     * Provide flexibility in doing batch render
-     * Call this method before calling renderBatch()
-     */
-    fun beginRender(sr: ShapeRenderer) {
-        // save old color to set it back later when we're done rendering
-        oldShapeRendererColor = sr.color
-
-        sr.color = Color(1f, 1f, 1f, 1f)
-        sr.begin(ShapeRenderer.ShapeType.Line)
-    }
-
-    /**
-     * Provide flexibility in doing batch render
-     * Call this method after calling renderBatch()
-     */
-    fun endRender(sr: ShapeRenderer) {
-        sr.end()
-
-        // set old color back to shape renderer
-        oldShapeRendererColor?.let { sr.color = it }
-    }
-
-    /**
      * Full single unit of render
      */
     fun render(sr: ShapeRenderer) {
-        beginRender(sr)
+        beginBatchRender(sr)
         renderBatch(sr)
-        endRender(sr)
+        endBatchRender(sr)
     }
 
-    fun renderBatch(sr: ShapeRenderer) {
+    override fun renderBatch(sr: ShapeRenderer) {
         // if hit
         if (isHit) {
             hitLines?.let {
@@ -268,12 +261,20 @@ class Player(maxBullet: Int): SpaceObject() {
             }
         }
 
+        // end current batch of rendering
+        endBatchRender(sr)
+
         // draw bullets
-        for (bullet in bullets) {
-            if (!bullet.shouldBeRemoved) {
-                bullet.renderBatch(sr)
-            }
+        Bullet.beginBatchRender(sr)
+        bullets.forEach {
+            if (!it.shouldBeRemoved) { it.renderBatch(sr) }
         }
+        Bullet.endBatchRender(sr)
+
+        // begin render again
+        // note: as we customized rendering to render all bullets too, thus we need to begin rendering again
+        // for next batch
+        beginBatchRender(sr)
     }
 
     fun shoot() {

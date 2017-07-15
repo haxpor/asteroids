@@ -1,17 +1,39 @@
 package io.wasin.asteroids.entities
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Pool
+import io.wasin.asteroids.interfaces.IBatchShapeRenderable
+import io.wasin.asteroids.interfaces.IBatchWrapperShapeRenderable
 
 /**
  * Created by haxpor on 7/10/17.
  */
-class Particle(x: Float, y: Float): SpaceObject(), Pool.Poolable {
+class Particle(x: Float, y: Float): SpaceObject(), Pool.Poolable, IBatchShapeRenderable {
     private var timer: Float = 0.0f
     private var time: Float = 1.0f
     var shouldBeRemoved: Boolean = false
         private set
+
+    // static context
+    companion object: IBatchWrapperShapeRenderable {
+        private var oldShapeRendererColor: Color? = null
+
+        override fun beginBatchRender(sr: ShapeRenderer) {
+            // save old color of renderer, we will set it back later
+            oldShapeRendererColor = sr.color
+            sr.color = Color.WHITE
+            sr.begin(ShapeRenderer.ShapeType.Line)
+        }
+
+        override fun endBatchRender(sr: ShapeRenderer) {
+            sr.end()
+
+            // set old color back to renderer
+            oldShapeRendererColor?.let { sr.color = it }
+        }
+    }
 
     constructor(): this(0f, 0f)
 
@@ -48,12 +70,12 @@ class Particle(x: Float, y: Float): SpaceObject(), Pool.Poolable {
     }
 
     fun render(sr: ShapeRenderer) {
-        sr.begin(ShapeRenderer.ShapeType.Line)
-        sr.circle(x - width / 2f, y - height / 2f, width / 2f)
-        sr.end()
+        beginBatchRender(sr)
+        renderBatch(sr)
+        endBatchRender(sr)
     }
 
-    fun renderBatch(sr: ShapeRenderer) {
+    override fun renderBatch(sr: ShapeRenderer) {
         sr.circle(x - width / 2f, y - height / 2f, width / 2f)
     }
 

@@ -5,11 +5,13 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Pool
 import com.badlogic.gdx.utils.viewport.Viewport
+import io.wasin.asteroids.interfaces.IBatchShapeRenderable
+import io.wasin.asteroids.interfaces.IBatchWrapperShapeRenderable
 
 /**
  * Created by haxpor on 7/10/17.
  */
-class Asteroid(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
+class Asteroid(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable, IBatchShapeRenderable {
     enum class Type {
         SMALL,
         MEDIUM,
@@ -17,18 +19,18 @@ class Asteroid(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
     }
 
     // static context
-    companion object {
+    companion object: IBatchWrapperShapeRenderable{
         const val MAX_NUMPOINTS: Int = 12
         private var oldShapeRendererColor: Color? = null
 
-        fun beginRender(sr: ShapeRenderer) {
+        override fun beginBatchRender(sr: ShapeRenderer) {
             // save old color of renderer, we will set it back later
             oldShapeRendererColor = sr.color
             sr.color = Color.WHITE
             sr.begin(ShapeRenderer.ShapeType.Line)
         }
 
-        fun endRender(sr: ShapeRenderer) {
+        override fun endBatchRender(sr: ShapeRenderer) {
             sr.end()
 
             // set old color back to renderer
@@ -134,12 +136,12 @@ class Asteroid(x: Float, y: Float, type: Type): SpaceObject(), Pool.Poolable {
     }
 
     fun render(sr: ShapeRenderer) {
-        beginRender(sr)
+        beginBatchRender(sr)
         renderBatch(sr)
-        endRender(sr)
+        endBatchRender(sr)
     }
 
-    fun renderBatch(sr: ShapeRenderer) {
+    override fun renderBatch(sr: ShapeRenderer) {
         for (i in 0..numPoints-1) {
             sr.line(shapex[i], shapey[i], shapex[(i+1)%numPoints], shapey[(i+1)%numPoints])
         }
