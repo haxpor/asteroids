@@ -46,7 +46,7 @@ class MenuItem(x: Float, y: Float, text: String, font: BitmapFont) {
             val location = Vector3(BBInput.screenX.toFloat(), BBInput.screenY.toFloat(), 0f)
             cam.unproject(location, viewport.screenX.toFloat(), viewport.screenY.toFloat(), viewport.screenWidth.toFloat(), viewport.screenHeight.toFloat())
 
-            if (BBInput.isMousePressed(BBInput.MOUSE_BUTTON_LEFT) && boundingRect.contains(location.x, location.y)) {
+            if (BBInput.isMousePressed(BBInput.MouseKey.LEFT) && boundingRect.contains(location.x, location.y)) {
                 it.onClick(this)
             }
         }

@@ -66,35 +66,48 @@ class Play(gsm: GameStateManager): GameState(gsm){
     }
 
     override fun handleInput(dt: Float) {
-        // left button is pressed and player is not going left
-        if (BBInput.isDown(BBInput.BUTTON_LEFT) && !player.left && !player.isHit) {
+
+        // there's still an issue with this as disconnected() didn't get called for BBInputProcessor
+        // wait to be fixed
+        val controller = BBInput.controller1()
+
+        // turn left
+        if (( (BBInput.isButtonDown(BBInput.ButtonKey.LEFT)) ||
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.L_ANALOG_LEFT)) ||
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_LEFT))) &&
+                !player.isHit) {
             player.left = true
         }
-        // left button is pressed and player is not going left
-        else if (!BBInput.isDown(BBInput.BUTTON_LEFT) && player.left && !player.isHit) {
+        else if (!player.isHit) {
             player.left = false
         }
 
-        // right button is pressed and player is not going right
-        if (BBInput.isDown(BBInput.BUTTON_RIGHT) && !player.right && !player.isHit) {
+        // turn right
+        if (( (BBInput.isButtonDown(BBInput.ButtonKey.RIGHT)) ||
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.L_ANALOG_RIGHT)) ||
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_RIGHT))) &&
+                !player.isHit) {
             player.right = true
         }
-        // right button is pressed and player is not going right
-        else if (!BBInput.isDown(BBInput.BUTTON_RIGHT) && player.right && !player.isHit) {
+        else if (!player.isHit) {
             player.right = false
         }
 
-        // up button is pressed and player is not going up
-        if (BBInput.isDown(BBInput.BUTTON_UP) && !player.up && !player.isHit) {
+        // go forward
+        if (( (BBInput.isButtonDown(BBInput.ButtonKey.UP)) ||
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.A)) ||
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_UP))) &&
+                !player.isHit) {
             player.up = true
         }
-        // up button is pressed and player is not going up
-        else if (!BBInput.isDown(BBInput.BUTTON_UP) && player.up && !player.isHit) {
+        else if (!player.isHit) {
             player.up = false
         }
 
         // shoot
-        if (BBInput.isPressed(BBInput.BUTTON_SPACE) && !player.isHit) {
+        if (( (BBInput.isButtonPressed(BBInput.ButtonKey.SPACE)) ||
+                (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.B))) &&
+                !player.isHit) {
             player.shoot()
         }
     }

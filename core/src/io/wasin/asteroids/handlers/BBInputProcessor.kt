@@ -30,10 +30,10 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
         // mouse
         BBInput.mouseDown = true
         if (button == Input.Buttons.LEFT) {
-            BBInput.setMouseKey(BBInput.MOUSE_BUTTON_LEFT, true)
+            BBInput.setMouseKey(BBInput.MouseKey.LEFT, true)
         }
         if (button == Input.Buttons.RIGHT) {
-            BBInput.setMouseKey(BBInput.MOUSE_BUTTON_RIGHT, true)
+            BBInput.setMouseKey(BBInput.MouseKey.RIGHT, true)
         }
 
         return true
@@ -48,10 +48,10 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
         // mouse
         BBInput.mouseDown = false
         if (button == Input.Buttons.LEFT) {
-            BBInput.setMouseKey(BBInput.MOUSE_BUTTON_LEFT, false)
+            BBInput.setMouseKey(BBInput.MouseKey.LEFT, false)
         }
         if (button == Input.Buttons.RIGHT) {
-            BBInput.setMouseKey(BBInput.MOUSE_BUTTON_RIGHT, false)
+            BBInput.setMouseKey(BBInput.MouseKey.RIGHT, false)
         }
 
         return true
@@ -67,56 +67,56 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
     override fun keyDown(keycode: Int): Boolean {
         if (keycode == Input.Keys.ENTER) {
-            BBInput.setKey(BBInput.BUTTON_ENTER, true)
+            BBInput.setButtonKey(BBInput.ButtonKey.ENTER, true)
         }
         if (keycode == Input.Keys.ESCAPE) {
-            BBInput.setKey(BBInput.BUTTON_ESCAPE, true)
+            BBInput.setButtonKey(BBInput.ButtonKey.ESCAPE, true)
         }
         if (keycode == Input.Keys.SPACE) {
-            BBInput.setKey(BBInput.BUTTON_SPACE, true)
+            BBInput.setButtonKey(BBInput.ButtonKey.SPACE, true)
         }
         if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
-            BBInput.setKey(BBInput.BUTTON_SHIFT, true)
+            BBInput.setButtonKey(BBInput.ButtonKey.SHIFT, true)
         }
         if (keycode == Input.Keys.LEFT) {
-            BBInput.setKey(BBInput.BUTTON_LEFT, true)
+            BBInput.setButtonKey(BBInput.ButtonKey.LEFT, true)
         }
         if (keycode == Input.Keys.RIGHT) {
-            BBInput.setKey(BBInput.BUTTON_RIGHT, true)
+            BBInput.setButtonKey(BBInput.ButtonKey.RIGHT, true)
         }
         if (keycode == Input.Keys.UP) {
-            BBInput.setKey(BBInput.BUTTON_UP, true)
+            BBInput.setButtonKey(BBInput.ButtonKey.UP, true)
         }
         if (keycode == Input.Keys.DOWN) {
-            BBInput.setKey(BBInput.BUTTON_DOWN, true)
+            BBInput.setButtonKey(BBInput.ButtonKey.DOWN, true)
         }
         return true
     }
 
     override fun keyUp(keycode: Int): Boolean {
         if (keycode == Input.Keys.ENTER) {
-            BBInput.setKey(BBInput.BUTTON_ENTER, false)
+            BBInput.setButtonKey(BBInput.ButtonKey.ENTER, false)
         }
         if (keycode == Input.Keys.ESCAPE) {
-            BBInput.setKey(BBInput.BUTTON_ESCAPE, false)
+            BBInput.setButtonKey(BBInput.ButtonKey.ESCAPE, false)
         }
         if (keycode == Input.Keys.SPACE) {
-            BBInput.setKey(BBInput.BUTTON_SPACE, false)
+            BBInput.setButtonKey(BBInput.ButtonKey.SPACE, false)
         }
         if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
-            BBInput.setKey(BBInput.BUTTON_SHIFT, false)
+            BBInput.setButtonKey(BBInput.ButtonKey.SHIFT, false)
         }
         if (keycode == Input.Keys.LEFT) {
-            BBInput.setKey(BBInput.BUTTON_LEFT, false)
+            BBInput.setButtonKey(BBInput.ButtonKey.LEFT, false)
         }
         if (keycode == Input.Keys.RIGHT) {
-            BBInput.setKey(BBInput.BUTTON_RIGHT, false)
+            BBInput.setButtonKey(BBInput.ButtonKey.RIGHT, false)
         }
         if (keycode == Input.Keys.UP) {
-            BBInput.setKey(BBInput.BUTTON_UP, false)
+            BBInput.setButtonKey(BBInput.ButtonKey.UP, false)
         }
         if (keycode == Input.Keys.DOWN) {
-            BBInput.setKey(BBInput.BUTTON_DOWN, false)
+            BBInput.setButtonKey(BBInput.ButtonKey.DOWN, false)
         }
         return true
     }
@@ -124,108 +124,157 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
     /** Contrllers **/
     override fun buttonDown(controller: Controller?, buttonCode: Int): Boolean {
 
-        // return false to allow other system to handle event too
-        if (controller != BBInput.controller1 && controller != BBInput.controller2 || controller == null) return false
+        controller?.let {
+            getCIndex(it)?.let {
 
-        var cindex = 0
+                for (i in 0..BBInput.controllerDowns.size-1) {
+                    BBInput.controllerDowns[i] = true
+                }
 
-        // check which controller to work with
-        if (controller == BBInput.controller1) {
-            cindex = 0
-        }
-        else if (controller == BBInput.controller2) {
-            cindex = 1
-        }
-
-        BBInput.controller1Down = true
-
-        if (buttonCode == Xbox.B) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_1, true)
-        }
-        else if (buttonCode == Xbox.A) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_2, true)
-        }
-        else if (buttonCode == Xbox.DPAD_LEFT) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT, true)
-        }
-        else if (buttonCode == Xbox.DPAD_RIGHT) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT, true)
-        }
-        else if (buttonCode == Xbox.DPAD_UP) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_UP, true)
-        }
-        else if (buttonCode == Xbox.DPAD_DOWN) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_DOWN, true)
-        }
-        else if (buttonCode == Xbox.L_TRIGGER) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT_TRIGGER, true)
-        }
-        else if (buttonCode == Xbox.R_TRIGGER) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT_TRIGGER, true)
-        }
-        else if (buttonCode == Xbox.L_BUMPER) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT_BUMPER, true)
-        }
-        else if (buttonCode == Xbox.R_BUMPER) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT_BUMPER, true)
+                if (buttonCode == Xbox.X) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.X, true)
+                }
+                if (buttonCode == Xbox.A) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.A, true)
+                }
+                if (buttonCode == Xbox.B) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.B, true)
+                }
+                if (buttonCode == Xbox.Y) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.Y, true)
+                }
+                if (buttonCode == Xbox.DPAD_LEFT) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.DPAD_LEFT, true)
+                }
+                if (buttonCode == Xbox.DPAD_RIGHT) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.DPAD_RIGHT, true)
+                }
+                if (buttonCode == Xbox.DPAD_UP) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.DPAD_UP, true)
+                }
+                if (buttonCode == Xbox.DPAD_DOWN) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.DPAD_DOWN, true)
+                }
+                if (buttonCode == Xbox.L_BUMPER) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.LEFT_BUMPER, true)
+                }
+                if (buttonCode == Xbox.R_BUMPER) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.RIGHT_BUMPER, true)
+                }
+            }
         }
 
         return true
     }
 
     override fun buttonUp(controller: Controller?, buttonCode: Int): Boolean {
-        // return false to allow other system to handle event too
-        if (controller != BBInput.controller1 && controller != BBInput.controller2 || controller == null) return false
 
-        var cindex = 0
+        controller?.let {
+            getCIndex(it)?.let {
 
-        // check which controller to work with
-        if (controller == BBInput.controller1) {
-            cindex = 0
-        }
-        else if (controller == BBInput.controller2) {
-            cindex = 1
-        }
+                for (i in 0..BBInput.controllerDowns.size-1) {
+                    BBInput.controllerDowns[i] = false
+                }
 
-        BBInput.controller1Down = false
-
-        if (buttonCode == Xbox.B) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_1, false)
-        }
-        else if (buttonCode == Xbox.A) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_2, false)
-        }
-        else if (buttonCode == Xbox.DPAD_LEFT) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT, false)
-        }
-        else if (buttonCode == Xbox.DPAD_RIGHT) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT, false)
-        }
-        else if (buttonCode == Xbox.DPAD_UP) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_UP, false)
-        }
-        else if (buttonCode == Xbox.DPAD_DOWN) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_DOWN, false)
-        }
-        else if (buttonCode == Xbox.L_TRIGGER) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT_TRIGGER, false)
-        }
-        else if (buttonCode == Xbox.R_TRIGGER) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT_TRIGGER, false)
-        }
-        else if (buttonCode == Xbox.L_BUMPER) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT_BUMPER, false)
-        }
-        else if (buttonCode == Xbox.R_BUMPER) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT_BUMPER, false)
+                if (buttonCode == Xbox.X) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.X, false)
+                }
+                if (buttonCode == Xbox.A) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.A, false)
+                }
+                if (buttonCode == Xbox.B) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.B, false)
+                }
+                if (buttonCode == Xbox.Y) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.Y, false)
+                }
+                if (buttonCode == Xbox.DPAD_LEFT) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.DPAD_LEFT, false)
+                }
+                if (buttonCode == Xbox.DPAD_RIGHT) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.DPAD_RIGHT, false)
+                }
+                if (buttonCode == Xbox.DPAD_UP) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.DPAD_UP, false)
+                }
+                if (buttonCode == Xbox.DPAD_DOWN) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.DPAD_DOWN, false)
+                }
+                if (buttonCode == Xbox.L_BUMPER) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.LEFT_BUMPER, false)
+                }
+                if (buttonCode == Xbox.R_BUMPER) {
+                    BBInput.setControllerKey(it, BBInput.ControllerKey.RIGHT_BUMPER, false)
+                }
+            }
         }
 
         return true
     }
 
     override fun axisMoved(controller: Controller?, axisCode: Int, value: Float): Boolean {
-        // ignore axis
-        // no need to return false to let other system handle it further
+
+        // handle analog stick and map it to button down/press for convenient in using in game
+        // in case the game needs precision and direct control of axis moved, recommended to use
+        // Controllers#getAxis() as provided by libgdx
+        controller?.let {
+            getCIndex(it)?.let {
+                // process left analog stick
+                // - horizontal
+                if (axisCode == Xbox.L_STICK_HORIZONTAL_AXIS) {
+                    // left
+                    if (value < -BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_LEFT, true)
+                    else BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_LEFT, false)
+
+                    // right
+                    if (value > BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_RIGHT, true)
+                    else BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_RIGHT, false)
+                }
+                // - vertical
+                if (axisCode == Xbox.L_STICK_VERTICAL_AXIS) {
+                    // up
+                    if (value < -BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_UP, true)
+                    else BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_UP, false)
+
+                    // down
+                    if (value > BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_DOWN, true)
+                    else BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_DOWN, false)
+                }
+
+                // process right analog stick
+                // - horizontal
+                if (axisCode == Xbox.R_STICK_HORIZONTAL_AXIS) {
+                    // left
+                    if (value < -BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_LEFT, true)
+                    else BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_LEFT, false)
+
+                    // right
+                    if (value > BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_RIGHT, true)
+                    else BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_RIGHT, false)
+                }
+                // - vertical
+                if (axisCode == Xbox.R_STICK_VERTICAL_AXIS) {
+                    // up
+                    if (value < -BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_UP, true)
+                    else BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_UP, false)
+
+                    // down
+                    if (value > BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_DOWN, true)
+                    else BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_DOWN, false)
+                }
+
+                // trigger button
+                if (axisCode == Xbox.L_TRIGGER) {
+                    if (value > (1f - BBInput.sensitivity)) BBInput.setControllerKey(it, BBInput.ControllerKey.LEFT_TRIGGER, true)
+                    else BBInput.setControllerKey(it, BBInput.ControllerKey.LEFT_TRIGGER, false)
+                }
+                if (axisCode == Xbox.R_TRIGGER) {
+                    if (value > (1f - BBInput.sensitivity)) BBInput.setControllerKey(it, BBInput.ControllerKey.RIGHT_TRIGGER, true)
+                    else BBInput.setControllerKey(it, BBInput.ControllerKey.RIGHT_TRIGGER, false)
+                }
+            }
+        }
+
         return true
     }
 
@@ -249,13 +298,13 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
         Gdx.app.log("BBInputProcessor", "New controller connected ${controller?.name}")
 
-        if (controller == null) return
-
-        if (BBInput.controller1 == null) {
-            BBInput.controller1 = controller
-        }
-        else if (BBInput.controller2 == null) {
-            BBInput.controller2 = controller
+        // loop to find the first null to set controller to it
+        controller?.let {
+            for (i in 0..BBInput.controllers.size-1) {
+                if (BBInput.controllers[i] == null) {
+                    BBInput.controllers[i] = it
+                }
+            }
         }
     }
 
@@ -263,27 +312,29 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
         Gdx.app.log("BBInputProcessor", "Controller disconnected ${controller?.name}")
 
-        if (controller == null) return
+        controller?.let {
 
-        if (BBInput.controller1 == controller && BBInput.controller1 != null) {
-            // remove previous listener
-            BBInput.controller1!!.removeListener(this)
-            // reset controller
-            BBInput.controller1 = null
-        }
-
-        if (BBInput.controller2 == controller && BBInput.controller2 != null) {
-            // remove previous listener
-            BBInput.controller2!!.removeListener(this)
-            // reset controller
-            BBInput.controller2 = null
+            // find matching controller, also when it still exists to properly remove
+            for (i in 0..BBInput.controllers.size-1) {
+                if (BBInput.controllers[i] != null &&
+                        BBInput.controllers[i] == it) {
+                    it.removeListener(this)
+                    BBInput.controllers[i] = null
+                }
+            }
         }
     }
 
-    fun setController1(controller: Controller) {
-        BBInput.controller1 = controller
-    }
-    fun setContorller2(controller: Controller) {
-        BBInput.controller2 = controller
+    /**
+     * Get c-index of input controller.
+     * If no matching controller found, then return null.
+     */
+    private fun getCIndex(controller: Controller): Int? {
+        BBInput.controllers.forEachIndexed { i, ct ->
+            if (ct == controller) {
+                return i
+            }
+        }
+        return null
     }
 }

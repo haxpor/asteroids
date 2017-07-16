@@ -2,6 +2,7 @@ package io.wasin.asteroids
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.controllers.ControllerListener
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.wasin.asteroids.handlers.*
@@ -48,21 +49,11 @@ class Game : ApplicationAdapter() {
         res.loadSound("sounds/smallsaucer.ogg", "smallsaucer")
         res.loadSound("sounds/thruster.ogg", "thruster")
 
-        // only this time to check for controller
-        // if user plug in controller after this then they have to restart the game
-        setupFirstActiveController()
+        // sync controllers
+        BBInput.syncControllers(Gdx.input.inputProcessor as ControllerListener)
 
         // go to main menu state
         gsm.setState(Mainmenu(gsm))
-    }
-
-    private fun setupFirstActiveController() {
-        if (Controllers.getControllers().count() > 0) {
-            val bbInputProcessor = Gdx.input.inputProcessor as BBInputProcessor
-            val controller = Controllers.getControllers().first()
-            controller.addListener(bbInputProcessor)
-            bbInputProcessor.setController1(controller)
-        }
     }
 
     override fun render() {

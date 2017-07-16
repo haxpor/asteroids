@@ -1,12 +1,82 @@
 package io.wasin.asteroids.handlers
 
 import com.badlogic.gdx.controllers.Controller
+import com.badlogic.gdx.controllers.ControllerListener
+import com.badlogic.gdx.controllers.Controllers
 
 /**
  * Created by haxpor on 5/16/17.
  */
 class BBInput {
+
+    /**
+     * Key mapping for keyboard that supported in this game.
+     */
+    enum class ButtonKey {
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN,
+        ENTER,
+        ESCAPE,
+        SPACE,
+        SHIFT
+    }
+
+    /**
+     * Key mapping for mouse that supported in this game.
+     */
+    enum class MouseKey {
+        LEFT,
+        RIGHT
+    }
+
+    /**
+     * Key mapping for controller that supported in this game.
+     */
+    enum class ControllerKey {
+        X,
+        A,
+        B,
+        Y,
+        DPAD_LEFT,
+        DPAD_RIGHT,
+        DPAD_UP,
+        DPAD_DOWN,
+        LEFT_BUMPER,
+        RIGHT_BUMPER,
+
+        // handle analog as digital (if needed)
+        L_ANALOG_LEFT,
+        L_ANALOG_RIGHT,
+        L_ANALOG_UP,
+        L_ANALOG_DOWN,
+
+        R_ANALOG_LEFT,
+        R_ANALOG_RIGHT,
+        R_ANALOG_UP,
+        R_ANALOG_DOWN,
+
+        LEFT_TRIGGER,
+        RIGHT_TRIGGER
+    }
+
     companion object {
+
+        /**
+         * Dead zone for GamePad
+         */
+        var deadZone: Float = 0.3f
+
+        /**
+         * Sensitivity when pressing analog button
+         */
+        var sensitivity: Float = 0.7f
+
+        /**
+         * Number of player that supported
+         */
+        const val NUM_CONTROLLER_SUPPORT: Int = 2
 
         var screenX: Int = 0
         var screenY: Int = 0
@@ -17,167 +87,149 @@ class BBInput {
         var mouseDown: Boolean = false
         var pMouseDown: Boolean = false
 
-        var controller1Down: Boolean = false
-        var pController1Down: Boolean = false
+        var controllerDowns: Array<Boolean> = Array(NUM_CONTROLLER_SUPPORT, { false })
+        var pControllerDowns: Array<Boolean> = Array(NUM_CONTROLLER_SUPPORT, { false })
 
-        var controller2Down: Boolean = false
-        var pController2Down: Boolean = false
+        var controllers: Array<Controller?> = Array(NUM_CONTROLLER_SUPPORT, { null })
 
-        var controller1: Controller? = null
-        var controller2: Controller? = null
+        var keys: Array<Boolean> = Array(ButtonKey.values().size, { false })
+        var pkeys: Array<Boolean> = Array(ButtonKey.values().size, { false })
 
-        const val NUM_KEYS: Int = 8
-        const val BUTTON_LEFT: Int = 0
-        const val BUTTON_RIGHT: Int = 1
-        const val BUTTON_UP: Int = 2
-        const val BUTTON_DOWN: Int = 3
-        const val BUTTON_ENTER: Int = 4
-        const val BUTTON_ESCAPE: Int = 5
-        const val BUTTON_SPACE: Int = 6
-        const val BUTTON_SHIFT: Int = 7
+        var mouseKeys: Array<Boolean> = Array(MouseKey.values().size, { false })
+        var pMouseKeys: Array<Boolean> = Array(MouseKey.values().size, { false })
 
-        const val NUM_MOUSE_KEYS: Int = 2
-        const val MOUSE_BUTTON_LEFT: Int = 0
-        const val MOUSE_BUTTON_RIGHT: Int = 1
+        var controller1Keys: Array<Boolean> = Array(ControllerKey.values().size, { false })
+        var pController1Keys: Array<Boolean> = Array(ControllerKey.values().size, { false })
 
-        const val NUM_CONTROLLER_KEYS: Int = 10
-        const val CONTROLLER_BUTTON_1: Int = 0
-        const val CONTROLLER_BUTTON_2: Int = 1
-        const val CONTROLLER_BUTTON_LEFT: Int = 2
-        const val CONTROLLER_BUTTON_RIGHT: Int = 3
-        const val CONTROLLER_BUTTON_UP: Int = 4
-        const val CONTROLLER_BUTTON_DOWN: Int = 5
-        const val CONTROLLER_BUTTON_LEFT_TRIGGER: Int = 6
-        const val CONTROLLER_BUTTON_RIGHT_TRIGGER: Int = 7
-        const val CONTROLLER_BUTTON_LEFT_BUMPER: Int = 8
-        const val CONTROLLER_BUTTON_RIGHT_BUMPER: Int = 9
+        var controller2Keys: Array<Boolean> = Array(ControllerKey.values().size, { false })
+        var pController2Keys: Array<Boolean> = Array(ControllerKey.values().size, { false })
 
-        var keys: Array<Boolean> = Array<Boolean>(NUM_KEYS, { i -> false})
-        var pkeys: Array<Boolean> = Array<Boolean>(NUM_KEYS, { i -> false})
-
-        var mouseKeys: Array<Boolean> = Array<Boolean>(NUM_MOUSE_KEYS, { i -> false})
-        var pMouseKeys: Array<Boolean> = Array<Boolean>(NUM_MOUSE_KEYS, { i -> false})
-
-        var controller1Keys: Array<Boolean> = Array<Boolean>(NUM_CONTROLLER_KEYS, { i -> false})
-        var pController1Keys: Array<Boolean> = Array<Boolean>(NUM_CONTROLLER_KEYS, { i -> false})
-
-        var controller2Keys: Array<Boolean> = Array<Boolean>(NUM_CONTROLLER_KEYS, { i -> false})
-        var pController2Keys: Array<Boolean> = Array<Boolean>(NUM_CONTROLLER_KEYS, { i -> false})
+        // convenient methods to get which controller from total number of controllers supported
+        fun controller1(): Controller? { return controllers[0] }
+        fun controller2(): Controller? { return controllers[1] }
 
         fun update() {
-            // update previous down
+            // update previous and current down for general
             pdown = down
             pMouseDown = mouseDown
-            pController1Down = controller1Down
-            pController2Down = controller2Down
 
-            for (i in 0..NUM_KEYS -1) {
+            for (i in 0..NUM_CONTROLLER_SUPPORT-1) {
+                pControllerDowns[i] = controllerDowns[i]
+            }
+
+            // update previous and current down for specific keys
+            for (i in 0..ButtonKey.values().size - 1) {
                 pkeys[i] = keys[i]
             }
 
-            for (i in 0..NUM_MOUSE_KEYS -1) {
+            for (i in 0..MouseKey.values().size - 1) {
                 pMouseKeys[i] = mouseKeys[i]
             }
 
-            for (i in 0..NUM_CONTROLLER_KEYS -1) {
+            for (i in 0..ControllerKey.values().size - 1) {
                 pController1Keys[i] = controller1Keys[i]
                 pController2Keys[i] = controller2Keys[i]
             }
         }
 
         /** isDown - specific **/
-        fun isDown(i: Int): Boolean {
-            return keys[i]
+        fun isButtonDown(key: ButtonKey): Boolean {
+            return keys[key.ordinal]
         }
-        fun isMouseDown(i: Int): Boolean {
-            return mouseKeys[i]
+        fun isMouseDown(key: MouseKey): Boolean {
+            return mouseKeys[key.ordinal]
         }
-        fun isControllerDown(cindex: Int, i: Int): Boolean {
+        fun isControllerDown(cindex: Int, key: ControllerKey): Boolean {
             if (cindex == 0) {
-                return controller1Keys[i]
+                return controller1Keys[key.ordinal]
             }
             else {
-                return controller2Keys[i]
+                return controller2Keys[key.ordinal]
             }
         }
 
         /** isPressed - specific **/
-        fun isPressed(i: Int): Boolean {
-            return keys[i] && !pkeys[i]
+        fun isButtonPressed(key: ButtonKey): Boolean {
+            return keys[key.ordinal] && !pkeys[key.ordinal]
         }
-        fun isMousePressed(i: Int): Boolean {
-            return mouseKeys[i] && !pMouseKeys[i]
+        fun isMousePressed(key: MouseKey): Boolean {
+            return mouseKeys[key.ordinal] && !pMouseKeys[key.ordinal]
         }
-        fun isControllerPressed(cindex: Int, i: Int): Boolean {
+        fun isControllerPressed(cindex: Int, key: ControllerKey): Boolean {
             if (cindex == 0) {
-                return controller1Keys[i] && !pController1Keys[i]
+                return controller1Keys[key.ordinal] && !pController1Keys[key.ordinal]
             }
             else {
-                return controller2Keys[i] && !pController2Keys[i]
+                return controller2Keys[key.ordinal] && !pController2Keys[key.ordinal]
             }
         }
 
         /** setKey **/
-        fun setKey(i: Int, b: Boolean) {
-            keys[i] = b
+        fun setButtonKey(key: ButtonKey, b: Boolean) {
+            keys[key.ordinal] = b
         }
-        fun setMouseKey(i: Int, b: Boolean) {
-            mouseKeys[i] = b
+        fun setMouseKey(key: MouseKey, b: Boolean) {
+            mouseKeys[key.ordinal] = b
         }
-        fun setControllerKey(cindex: Int, i: Int, b: Boolean) {
+        fun setControllerKey(cindex: Int, key: ControllerKey, b: Boolean) {
             if (cindex == 0) {
-                controller1Keys[i] = b
+                controller1Keys[key.ordinal] = b
             }
             else {
-                controller2Keys[i] = b
+                controller2Keys[key.ordinal] = b
             }
         }
 
         /** isDown **/
-        fun isDown(): Boolean {
+        fun isButtonDown(): Boolean {
             return down
         }
         fun isMouseDown(): Boolean {
             return mouseDown
         }
         fun isControllerDown(cindex: Int): Boolean {
-            if (cindex == 0) {
-                return controller1Down
-            }
-            else {
-                return controller2Down
-            }
+            return controllerDowns[cindex]
         }
 
         /** isPressed **/
-        fun isPressed(): Boolean {
+        fun isButtonPressed(): Boolean {
             return down && !pdown
         }
         fun isMousePressed(): Boolean {
             return mouseDown && !pMouseDown
         }
         fun isControllerPressed(cindex: Int): Boolean {
-            if (cindex == 0) {
-                return controller1Down && !pController1Down
-            }
-            else {
-                return controller2Down && !pController2Down
-            }
+            return controllerDowns[cindex] && !pControllerDowns[cindex]
         }
 
         /** isReleased **/
-        fun isReleased(): Boolean {
+        fun isButtonReleased(): Boolean {
             return pdown && !down
         }
         fun isMouseReleased(): Boolean {
             return pMouseDown && !mouseDown
         }
         fun isControllerReleased(cindex: Int): Boolean {
-            if (cindex == 0) {
-                return pController1Down && !controller1Down
+            return pControllerDowns[cindex] && !controllerDowns[cindex]
+        }
+
+        /**
+         * It will nullify all current reference controller, then set all current detected
+         * controllers back again.
+         *
+         * Use this to sync controllers at any given time.
+         */
+        fun syncControllers(listener: ControllerListener) {
+
+            // null all current controllers
+            for (i in 0..controllers.size-1) {
+                controllers[i] = null
             }
-            else {
-                return pController2Down && !controller2Down
+
+            // loop to set all detected controllers
+            Controllers.getControllers().forEachIndexed { i, ct ->
+                ct.addListener(listener)
+                controllers[i] = ct
             }
         }
     }

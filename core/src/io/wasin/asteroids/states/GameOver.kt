@@ -79,32 +79,43 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
     }
 
     override fun handleInput(dt: Float) {
+        val controller = BBInput.controller1()
+
         if (regardedAsOneOfHighScores) {
             // safe to use !! here as we checked it via flag
 
             // select which character to operate on
-            if (BBInput.isPressed(BBInput.BUTTON_LEFT)) {
+            if (BBInput.isButtonPressed(BBInput.ButtonKey.LEFT) ||
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.DPAD_LEFT)) ||
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.L_ANALOG_LEFT))) {
                 currentNameInputCharacterIndex = (3 + currentNameInputCharacterIndex - 1) % 3
             }
-            if (BBInput.isPressed(BBInput.BUTTON_RIGHT)) {
+            if (BBInput.isButtonPressed(BBInput.ButtonKey.RIGHT) ||
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.DPAD_RIGHT)) ||
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.L_ANALOG_RIGHT))) {
                 currentNameInputCharacterIndex = (currentNameInputCharacterIndex + 1) % 3
             }
 
             // select characters for selected operating character
             // possible character in decimal as in ascii table is 65-90 which is A-Z which is 26 characters in total
-            if (BBInput.isPressed(BBInput.BUTTON_UP)) {
+            if (BBInput.isButtonPressed(BBInput.ButtonKey.UP) ||
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.DPAD_UP)) ||
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.L_ANALOG_UP))) {
                 inputName!![currentNameInputCharacterIndex] = (((inputName!![currentNameInputCharacterIndex].toInt() - 65 + 1) % 26) + 65).toChar()
                 // update glyph
                 inputNameGlyph!!.setText(inputNameFont, inputName)
             }
-            if (BBInput.isPressed(BBInput.BUTTON_DOWN)) {
+            if (BBInput.isButtonPressed(BBInput.ButtonKey.DOWN) ||
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.DPAD_DOWN)) ||
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.L_ANALOG_DOWN))) {
                 inputName!![currentNameInputCharacterIndex] = (((inputName!![currentNameInputCharacterIndex].toInt() - 65 - 1 + 26) % 26) + 65).toChar()
                 // update glyph
                 inputNameGlyph!!.setText(inputNameFont, inputName)
             }
 
             // submit
-            if (BBInput.isPressed(BBInput.BUTTON_ENTER)) {
+            if (BBInput.isButtonPressed(BBInput.ButtonKey.ENTER) ||
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.A))) {
                 // update a new score, and write to file immediately
                 game.playerSaveFileManager.updateWithNewPlayerScore(PlayerScore(inputName.toString(), score), true)
                 // go back to mainmenu
@@ -112,7 +123,9 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
             }
         }
         else {
-            if (BBInput.isPressed(BBInput.BUTTON_ENTER)) {
+            if (BBInput.isButtonPressed(BBInput.ButtonKey.ENTER) ||
+                    BBInput.isMousePressed(BBInput.MouseKey.LEFT) ||
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.A))) {
                 // go back to mainmenu
                 gsm.setState(Mainmenu(gsm))
             }
