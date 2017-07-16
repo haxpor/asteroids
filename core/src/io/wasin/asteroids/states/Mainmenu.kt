@@ -76,22 +76,22 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
 
     override fun handleInput(dt: Float) {
 
-        val gamepad = BBInput.controller1
+        val controller = BBInput.controller1
 
         if (BBInput.isButtonPressed(BBInput.ButtonKey.UP) ||
-                (gamepad != null && BBInput.isGamePadPressed(0, BBInput.GamePadKey.DPAD_UP))) {
+                (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.DPAD_UP))) {
             currentSelectedMenuItem--
             if (currentSelectedMenuItem < 0f) {
                 currentSelectedMenuItem = itemTitles.size + currentSelectedMenuItem
             }
         }
         if (BBInput.isButtonPressed(BBInput.ButtonKey.DOWN) ||
-                (gamepad != null && BBInput.isGamePadPressed(0, BBInput.GamePadKey.DPAD_DOWN))) {
+                (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.DPAD_DOWN))) {
             currentSelectedMenuItem = (currentSelectedMenuItem+1) % itemTitles.size
         }
 
         if (BBInput.isButtonPressed(BBInput.ButtonKey.ENTER) ||
-                (gamepad != null && BBInput.isGamePadDown(0, BBInput.GamePadKey.A))) {
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.A))) {
             select()
         }
     }

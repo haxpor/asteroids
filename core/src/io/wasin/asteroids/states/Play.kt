@@ -1,8 +1,6 @@
 package io.wasin.asteroids.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.controllers.Controllers
-import com.badlogic.gdx.controllers.mappings.Xbox
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
@@ -12,7 +10,6 @@ import io.wasin.asteroids.Game
 import io.wasin.asteroids.entities.*
 import io.wasin.asteroids.handlers.BBInput
 import io.wasin.asteroids.handlers.GameStateManager
-import io.wasin.asteroids.handlers.Settings
 import io.wasin.asteroids.handlers.SimulatedBgMusic
 
 /**
@@ -72,12 +69,12 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
         // there's still an issue with this as disconnected() didn't get called for BBInputProcessor
         // wait to be fixed
-        val gamepad = BBInput.controller1
+        val controller = BBInput.controller1
 
         // turn left
         if (( (BBInput.isButtonDown(BBInput.ButtonKey.LEFT)) ||
-                (gamepad != null && gamepad.getAxis(Xbox.L_STICK_HORIZONTAL_AXIS) < -Settings.GAMEPAD_DEADZONE_VALUE) ||
-                (gamepad != null && BBInput.isGamePadDown(0, BBInput.GamePadKey.DPAD_LEFT))) &&
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.L_ANALOG_LEFT)) ||
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_LEFT))) &&
                 !player.isHit) {
             player.left = true
         }
@@ -87,8 +84,8 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
         // turn right
         if (( (BBInput.isButtonDown(BBInput.ButtonKey.RIGHT)) ||
-                (gamepad != null && gamepad.getAxis(Xbox.L_STICK_HORIZONTAL_AXIS) > Settings.GAMEPAD_DEADZONE_VALUE) ||
-                (gamepad != null && BBInput.isGamePadDown(0, BBInput.GamePadKey.DPAD_RIGHT))) &&
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.L_ANALOG_RIGHT)) ||
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_RIGHT))) &&
                 !player.isHit) {
             player.right = true
         }
@@ -98,8 +95,8 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
         // go forward
         if (( (BBInput.isButtonDown(BBInput.ButtonKey.UP)) ||
-                (gamepad != null && BBInput.isGamePadDown(0, BBInput.GamePadKey.A)) ||
-                (gamepad != null && BBInput.isGamePadDown(0, BBInput.GamePadKey.DPAD_UP))) &&
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.A)) ||
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_UP))) &&
                 !player.isHit) {
             player.up = true
         }
@@ -109,7 +106,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
         // shoot
         if (( (BBInput.isButtonPressed(BBInput.ButtonKey.SPACE)) ||
-                (gamepad != null && BBInput.isGamePadPressed(0, BBInput.GamePadKey.B))) &&
+                (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.B))) &&
                 !player.isHit) {
             player.shoot()
         }

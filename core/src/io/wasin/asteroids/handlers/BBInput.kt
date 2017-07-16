@@ -9,7 +9,6 @@ class BBInput {
 
     /**
      * Key mapping for keyboard that supported in this game.
-     * Define more keys here and implement in BBInputProcessor.
      */
     enum class ButtonKey {
         LEFT,
@@ -24,7 +23,6 @@ class BBInput {
 
     /**
      * Key mapping for mouse that supported in this game.
-     * Similar to ButtonKey.
      */
     enum class MouseKey {
         LEFT,
@@ -32,10 +30,9 @@ class BBInput {
     }
 
     /**
-     * Key mapping for GamePad that supported in this game.
-     * Similar to ButtonKey.
+     * Key mapping for controller that supported in this game.
      */
-    enum class GamePadKey {
+    enum class ControllerKey {
         X,
         A,
         B,
@@ -46,11 +43,33 @@ class BBInput {
         DPAD_DOWN,
         LEFT_BUMPER,
         RIGHT_BUMPER,
+
+        // handle analog as digital (if needed)
+        L_ANALOG_LEFT,
+        L_ANALOG_RIGHT,
+        L_ANALOG_UP,
+        L_ANALOG_DOWN,
+
+        R_ANALOG_LEFT,
+        R_ANALOG_RIGHT,
+        R_ANALOG_UP,
+        R_ANALOG_DOWN,
+
         LEFT_TRIGGER,
         RIGHT_TRIGGER
     }
 
     companion object {
+
+        /**
+         * Dead zone for GamePad
+         */
+        var deadZone: Float = 0.3f
+
+        /**
+         * Sensitivity when pressing analog button
+         */
+        var sensitivity: Float = 0.7f
 
         var screenX: Int = 0
         var screenY: Int = 0
@@ -70,17 +89,18 @@ class BBInput {
         var controller1: Controller? = null
         var controller2: Controller? = null
 
-        var keys: Array<Boolean> = Array(ButtonKey.values().size, { _ -> false})
-        var pkeys: Array<Boolean> = Array(ButtonKey.values().size, { _ -> false})
+        var keys: Array<Boolean> = Array(ButtonKey.values().size, { false })
+        var pkeys: Array<Boolean> = Array(ButtonKey.values().size, { false })
 
-        var mouseKeys: Array<Boolean> = Array(MouseKey.values().size, { _ -> false})
-        var pMouseKeys: Array<Boolean> = Array(MouseKey.values().size, { _ -> false})
+        var mouseKeys: Array<Boolean> = Array(MouseKey.values().size, { false })
+        var pMouseKeys: Array<Boolean> = Array(MouseKey.values().size, { false })
 
-        var controller1Keys: Array<Boolean> = Array(GamePadKey.values().size, { _ -> false})
-        var pController1Keys: Array<Boolean> = Array(GamePadKey.values().size, { _ -> false})
+        var controller1Keys: Array<Boolean> = Array(ControllerKey.values().size, { false })
+        var pController1Keys: Array<Boolean> = Array(ControllerKey.values().size, { false })
 
-        var controller2Keys: Array<Boolean> = Array(GamePadKey.values().size, { _ -> false})
-        var pController2Keys: Array<Boolean> = Array(GamePadKey.values().size, { _ -> false})
+        var controller2Keys: Array<Boolean> = Array(ControllerKey.values().size, { false })
+        var pController2Keys: Array<Boolean> = Array(ControllerKey.values().size, { false })
+
 
         fun update() {
             // update previous down
@@ -97,7 +117,7 @@ class BBInput {
                 pMouseKeys[i] = mouseKeys[i]
             }
 
-            for (i in 0..GamePadKey.values().size - 1) {
+            for (i in 0..ControllerKey.values().size - 1) {
                 pController1Keys[i] = controller1Keys[i]
                 pController2Keys[i] = controller2Keys[i]
             }
@@ -110,7 +130,7 @@ class BBInput {
         fun isMouseDown(key: MouseKey): Boolean {
             return mouseKeys[key.ordinal]
         }
-        fun isGamePadDown(cindex: Int, key: GamePadKey): Boolean {
+        fun isControllerDown(cindex: Int, key: ControllerKey): Boolean {
             if (cindex == 0) {
                 return controller1Keys[key.ordinal]
             }
@@ -126,7 +146,7 @@ class BBInput {
         fun isMousePressed(key: MouseKey): Boolean {
             return mouseKeys[key.ordinal] && !pMouseKeys[key.ordinal]
         }
-        fun isGamePadPressed(cindex: Int, key: GamePadKey): Boolean {
+        fun isControllerPressed(cindex: Int, key: ControllerKey): Boolean {
             if (cindex == 0) {
                 return controller1Keys[key.ordinal] && !pController1Keys[key.ordinal]
             }
@@ -142,7 +162,7 @@ class BBInput {
         fun setMouseKey(key: MouseKey, b: Boolean) {
             mouseKeys[key.ordinal] = b
         }
-        fun setGamePadKey(cindex: Int, key: GamePadKey, b: Boolean) {
+        fun setControllerKey(cindex: Int, key: ControllerKey, b: Boolean) {
             if (cindex == 0) {
                 controller1Keys[key.ordinal] = b
             }
@@ -158,7 +178,7 @@ class BBInput {
         fun isMouseDown(): Boolean {
             return mouseDown
         }
-        fun isGamePadDown(cindex: Int): Boolean {
+        fun isControllerDown(cindex: Int): Boolean {
             if (cindex == 0) {
                 return controller1Down
             }
@@ -174,7 +194,7 @@ class BBInput {
         fun isMousePressed(): Boolean {
             return mouseDown && !pMouseDown
         }
-        fun isGamePadPressed(cindex: Int): Boolean {
+        fun isControllerPressed(cindex: Int): Boolean {
             if (cindex == 0) {
                 return controller1Down && !pController1Down
             }
@@ -190,7 +210,7 @@ class BBInput {
         fun isMouseReleased(): Boolean {
             return pMouseDown && !mouseDown
         }
-        fun isGamePadReleased(cindex: Int): Boolean {
+        fun isControllerReleased(cindex: Int): Boolean {
             if (cindex == 0) {
                 return pController1Down && !controller1Down
             }
