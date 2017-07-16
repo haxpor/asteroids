@@ -7,6 +7,10 @@ import com.badlogic.gdx.controllers.Controller
  */
 class BBInput {
 
+    /**
+     * Key mapping for keyboard that supported in this game.
+     * Define more keys here and implement in BBInputProcessor.
+     */
     enum class ButtonKey {
         LEFT,
         RIGHT,
@@ -18,11 +22,19 @@ class BBInput {
         SHIFT
     }
 
+    /**
+     * Key mapping for mouse that supported in this game.
+     * Similar to ButtonKey.
+     */
     enum class MouseKey {
         LEFT,
         RIGHT
     }
 
+    /**
+     * Key mapping for GamePad that supported in this game.
+     * Similar to ButtonKey.
+     */
     enum class GamePadKey {
         X,
         A,
