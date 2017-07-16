@@ -71,7 +71,7 @@ class Content: Disposable {
 
     override fun dispose() {
         // remove all resource
-        for (s in textures.keys) { removeTexture(s) }
+        textures.keys.toSet().asIterable().forEach { removeTexture(it) }
 
         // note: no removal of sounds & music, they are automatically handled by libgdx
     }
