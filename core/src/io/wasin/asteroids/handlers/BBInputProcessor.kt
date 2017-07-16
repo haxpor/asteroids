@@ -233,11 +233,11 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
                 // - vertical
                 if (axisCode == Xbox.L_STICK_VERTICAL_AXIS) {
                     // up
-                    if (value > BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_UP, true)
+                    if (value < -BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_UP, true)
                     else BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_UP, false)
 
                     // down
-                    if (value < -BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_DOWN, true)
+                    if (value > BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_DOWN, true)
                     else BBInput.setControllerKey(it, BBInput.ControllerKey.L_ANALOG_DOWN, false)
                 }
 
@@ -255,11 +255,11 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
                 // - vertical
                 if (axisCode == Xbox.R_STICK_VERTICAL_AXIS) {
                     // up
-                    if (value > BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_UP, true)
+                    if (value < -BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_UP, true)
                     else BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_UP, false)
 
                     // down
-                    if (value < -BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_DOWN, true)
+                    if (value > BBInput.deadZone) BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_DOWN, true)
                     else BBInput.setControllerKey(it, BBInput.ControllerKey.R_ANALOG_DOWN, false)
                 }
 
