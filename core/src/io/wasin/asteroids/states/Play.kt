@@ -1,6 +1,8 @@
 package io.wasin.asteroids.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.controllers.Controllers
+import com.badlogic.gdx.controllers.mappings.Xbox
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
@@ -10,6 +12,7 @@ import io.wasin.asteroids.Game
 import io.wasin.asteroids.entities.*
 import io.wasin.asteroids.handlers.BBInput
 import io.wasin.asteroids.handlers.GameStateManager
+import io.wasin.asteroids.handlers.Settings
 import io.wasin.asteroids.handlers.SimulatedBgMusic
 
 /**
@@ -66,35 +69,48 @@ class Play(gsm: GameStateManager): GameState(gsm){
     }
 
     override fun handleInput(dt: Float) {
-        // left button is pressed and player is not going left
-        if (BBInput.isDown(BBInput.BUTTON_LEFT) && !player.left && !player.isHit) {
+
+        // there's still an issue with this as disconnected() didn't get called for BBInputProcessor
+        // wait to be fixed
+        val gamepad = BBInput.controller1
+
+        // turn left
+        if (( (BBInput.isDown(BBInput.BUTTON_LEFT) && gamepad == null) ||
+                (gamepad != null && gamepad.getAxis(Xbox.L_STICK_HORIZONTAL_AXIS) < -Settings.GAMEPAD_DEADZONE_VALUE) ||
+                (gamepad != null && BBInput.isControllerDown(0, BBInput.CONTROLLER_BUTTON_LEFT))) &&
+                !player.isHit) {
             player.left = true
         }
-        // left button is pressed and player is not going left
-        else if (!BBInput.isDown(BBInput.BUTTON_LEFT) && player.left && !player.isHit) {
+        else if (!player.isHit) {
             player.left = false
         }
 
-        // right button is pressed and player is not going right
-        if (BBInput.isDown(BBInput.BUTTON_RIGHT) && !player.right && !player.isHit) {
+        // turn right
+        if (( (BBInput.isDown(BBInput.BUTTON_RIGHT) && gamepad == null) ||
+                (gamepad != null && gamepad.getAxis(Xbox.L_STICK_HORIZONTAL_AXIS) > Settings.GAMEPAD_DEADZONE_VALUE) ||
+                (gamepad != null && BBInput.isControllerDown(0, BBInput.CONTROLLER_BUTTON_RIGHT))) &&
+                !player.isHit) {
             player.right = true
         }
-        // right button is pressed and player is not going right
-        else if (!BBInput.isDown(BBInput.BUTTON_RIGHT) && player.right && !player.isHit) {
+        else if (!player.isHit) {
             player.right = false
         }
 
-        // up button is pressed and player is not going up
-        if (BBInput.isDown(BBInput.BUTTON_UP) && !player.up && !player.isHit) {
+        // go forward
+        if (( (BBInput.isDown(BBInput.BUTTON_UP) && gamepad == null) ||
+                (gamepad != null && BBInput.isControllerDown(0, BBInput.CONTROLLER_BUTTON_A)) ||
+                (gamepad != null && BBInput.isControllerDown(0, BBInput.CONTROLLER_BUTTON_UP))) &&
+                !player.isHit) {
             player.up = true
         }
-        // up button is pressed and player is not going up
-        else if (!BBInput.isDown(BBInput.BUTTON_UP) && player.up && !player.isHit) {
+        else if (!player.isHit) {
             player.up = false
         }
 
         // shoot
-        if (BBInput.isPressed(BBInput.BUTTON_SPACE) && !player.isHit) {
+        if (( (BBInput.isPressed(BBInput.BUTTON_SPACE) && gamepad == null) ||
+                (gamepad != null && BBInput.isControllerPressed(0, BBInput.CONTROLLER_BUTTON_B))) &&
+                !player.isHit) {
             player.shoot()
         }
     }

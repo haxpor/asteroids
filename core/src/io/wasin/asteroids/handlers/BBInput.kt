@@ -40,17 +40,19 @@ class BBInput {
         const val MOUSE_BUTTON_LEFT: Int = 0
         const val MOUSE_BUTTON_RIGHT: Int = 1
 
-        const val NUM_CONTROLLER_KEYS: Int = 10
-        const val CONTROLLER_BUTTON_1: Int = 0
-        const val CONTROLLER_BUTTON_2: Int = 1
-        const val CONTROLLER_BUTTON_LEFT: Int = 2
-        const val CONTROLLER_BUTTON_RIGHT: Int = 3
-        const val CONTROLLER_BUTTON_UP: Int = 4
-        const val CONTROLLER_BUTTON_DOWN: Int = 5
-        const val CONTROLLER_BUTTON_LEFT_TRIGGER: Int = 6
-        const val CONTROLLER_BUTTON_RIGHT_TRIGGER: Int = 7
-        const val CONTROLLER_BUTTON_LEFT_BUMPER: Int = 8
-        const val CONTROLLER_BUTTON_RIGHT_BUMPER: Int = 9
+        const val NUM_CONTROLLER_KEYS: Int = 12
+        const val CONTROLLER_BUTTON_X: Int = 0
+        const val CONTROLLER_BUTTON_A: Int = 1
+        const val CONTROLLER_BUTTON_B: Int = 2
+        const val CONTROLLER_BUTTON_Y: Int = 3
+        const val CONTROLLER_BUTTON_LEFT: Int = 4
+        const val CONTROLLER_BUTTON_RIGHT: Int = 5
+        const val CONTROLLER_BUTTON_UP: Int = 6
+        const val CONTROLLER_BUTTON_DOWN: Int = 7
+        const val CONTROLLER_BUTTON_LEFT_TRIGGER: Int = 8
+        const val CONTROLLER_BUTTON_RIGHT_TRIGGER: Int = 9
+        const val CONTROLLER_BUTTON_LEFT_BUMPER: Int = 10
+        const val CONTROLLER_BUTTON_RIGHT_BUMPER: Int = 11
 
         var keys: Array<Boolean> = Array<Boolean>(NUM_KEYS, { i -> false})
         var pkeys: Array<Boolean> = Array<Boolean>(NUM_KEYS, { i -> false})

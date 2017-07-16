@@ -139,34 +139,40 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
         BBInput.controller1Down = true
 
+        if (buttonCode == Xbox.X) {
+            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_X, true)
+        }
+        if (buttonCode == Xbox.A) {
+            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_A, true)
+        }
         if (buttonCode == Xbox.B) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_1, true)
+            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_B, true)
         }
-        else if (buttonCode == Xbox.A) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_2, true)
+        if (buttonCode == Xbox.Y) {
+            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_Y, true)
         }
-        else if (buttonCode == Xbox.DPAD_LEFT) {
+        if (buttonCode == Xbox.DPAD_LEFT) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT, true)
         }
-        else if (buttonCode == Xbox.DPAD_RIGHT) {
+        if (buttonCode == Xbox.DPAD_RIGHT) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT, true)
         }
-        else if (buttonCode == Xbox.DPAD_UP) {
+        if (buttonCode == Xbox.DPAD_UP) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_UP, true)
         }
-        else if (buttonCode == Xbox.DPAD_DOWN) {
+        if (buttonCode == Xbox.DPAD_DOWN) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_DOWN, true)
         }
-        else if (buttonCode == Xbox.L_TRIGGER) {
+        if (buttonCode == Xbox.L_TRIGGER) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT_TRIGGER, true)
         }
-        else if (buttonCode == Xbox.R_TRIGGER) {
+        if (buttonCode == Xbox.R_TRIGGER) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT_TRIGGER, true)
         }
-        else if (buttonCode == Xbox.L_BUMPER) {
+        if (buttonCode == Xbox.L_BUMPER) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT_BUMPER, true)
         }
-        else if (buttonCode == Xbox.R_BUMPER) {
+        if (buttonCode == Xbox.R_BUMPER) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT_BUMPER, true)
         }
 
@@ -189,34 +195,40 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
         BBInput.controller1Down = false
 
+        if (buttonCode == Xbox.X) {
+            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_X, false)
+        }
+        if (buttonCode == Xbox.A) {
+            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_A, false)
+        }
         if (buttonCode == Xbox.B) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_1, false)
+            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_B, false)
         }
-        else if (buttonCode == Xbox.A) {
-            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_2, false)
+        if (buttonCode == Xbox.Y) {
+            BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_Y, false)
         }
-        else if (buttonCode == Xbox.DPAD_LEFT) {
+        if (buttonCode == Xbox.DPAD_LEFT) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT, false)
         }
-        else if (buttonCode == Xbox.DPAD_RIGHT) {
+        if (buttonCode == Xbox.DPAD_RIGHT) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT, false)
         }
-        else if (buttonCode == Xbox.DPAD_UP) {
+        if (buttonCode == Xbox.DPAD_UP) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_UP, false)
         }
-        else if (buttonCode == Xbox.DPAD_DOWN) {
+        if (buttonCode == Xbox.DPAD_DOWN) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_DOWN, false)
         }
-        else if (buttonCode == Xbox.L_TRIGGER) {
+        if (buttonCode == Xbox.L_TRIGGER) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT_TRIGGER, false)
         }
-        else if (buttonCode == Xbox.R_TRIGGER) {
+        if (buttonCode == Xbox.R_TRIGGER) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT_TRIGGER, false)
         }
-        else if (buttonCode == Xbox.L_BUMPER) {
+        if (buttonCode == Xbox.L_BUMPER) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_LEFT_BUMPER, false)
         }
-        else if (buttonCode == Xbox.R_BUMPER) {
+        if (buttonCode == Xbox.R_BUMPER) {
             BBInput.setControllerKey(cindex, BBInput.CONTROLLER_BUTTON_RIGHT_BUMPER, false)
         }
 
