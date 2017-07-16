@@ -51,7 +51,7 @@ class HighScore(gsm: GameStateManager): GameState(gsm) {
         if (BBInput.isButtonPressed(BBInput.ButtonKey.ENTER) ||
                 BBInput.isButtonPressed(BBInput.ButtonKey.SPACE) ||
                 BBInput.isMousePressed(BBInput.MouseKey.LEFT) ||
-                (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.A))) {
+                (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.B))) {
             gsm.setState(Mainmenu(gsm))
         }
     }
