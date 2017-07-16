@@ -76,7 +76,7 @@ class Mainmenu(gsm: GameStateManager): GameState(gsm), MenuItem.Clickable {
 
     override fun handleInput(dt: Float) {
 
-        val controller = BBInput.controller1
+        val controller = BBInput.controller1()
 
         if (BBInput.isButtonPressed(BBInput.ButtonKey.UP) ||
                 (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.DPAD_UP))) {

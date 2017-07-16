@@ -126,7 +126,10 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
         controller?.let {
             getCIndex(it)?.let {
-                BBInput.controller1Down = true
+
+                for (i in 0..BBInput.controllerDowns.size-1) {
+                    BBInput.controllerDowns[i] = true
+                }
 
                 if (buttonCode == Xbox.X) {
                     BBInput.setControllerKey(it, BBInput.ControllerKey.X, true)
@@ -168,7 +171,10 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
         controller?.let {
             getCIndex(it)?.let {
-                BBInput.controller1Down = false
+
+                for (i in 0..BBInput.controllerDowns.size-1) {
+                    BBInput.controllerDowns[i] = false
+                }
 
                 if (buttonCode == Xbox.X) {
                     BBInput.setControllerKey(it, BBInput.ControllerKey.X, false)
@@ -292,13 +298,13 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
         Gdx.app.log("BBInputProcessor", "New controller connected ${controller?.name}")
 
-        if (controller == null) return
-
-        if (BBInput.controller1 == null) {
-            BBInput.controller1 = controller
-        }
-        else if (BBInput.controller2 == null) {
-            BBInput.controller2 = controller
+        // loop to find the first null to set controller to it
+        controller?.let {
+            for (i in 0..BBInput.controllers.size-1) {
+                if (BBInput.controllers[i] == null) {
+                    BBInput.controllers[i] = it
+                }
+            }
         }
     }
 
@@ -306,28 +312,17 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
 
         Gdx.app.log("BBInputProcessor", "Controller disconnected ${controller?.name}")
 
-        if (controller == null) return
+        controller?.let {
 
-        if (BBInput.controller1 == controller && BBInput.controller1 != null) {
-            // remove previous listener
-            BBInput.controller1!!.removeListener(this)
-            // reset controller
-            BBInput.controller1 = null
+            // find matching controller, also when it still exists to properly remove
+            for (i in 0..BBInput.controllers.size-1) {
+                if (BBInput.controllers[i] != null &&
+                        BBInput.controllers[i] == it) {
+                    it.removeListener(this)
+                    BBInput.controllers[i] = null
+                }
+            }
         }
-
-        if (BBInput.controller2 == controller && BBInput.controller2 != null) {
-            // remove previous listener
-            BBInput.controller2!!.removeListener(this)
-            // reset controller
-            BBInput.controller2 = null
-        }
-    }
-
-    fun setController1(controller: Controller) {
-        BBInput.controller1 = controller
-    }
-    fun setContorller2(controller: Controller) {
-        BBInput.controller2 = controller
     }
 
     /**
@@ -335,8 +330,11 @@ class BBInputProcessor : InputAdapter(), ControllerListener {
      * If no matching controller found, then return null.
      */
     private fun getCIndex(controller: Controller): Int? {
-        if (controller == BBInput.controller1) return 0
-        else if (controller == BBInput.controller2) return 1
-        else return null
+        BBInput.controllers.forEachIndexed { i, ct ->
+            if (ct == controller) {
+                return i
+            }
+        }
+        return null
     }
 }

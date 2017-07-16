@@ -1,6 +1,8 @@
 package io.wasin.asteroids.handlers
 
 import com.badlogic.gdx.controllers.Controller
+import com.badlogic.gdx.controllers.ControllerListener
+import com.badlogic.gdx.controllers.Controllers
 
 /**
  * Created by haxpor on 5/16/17.
@@ -71,6 +73,11 @@ class BBInput {
          */
         var sensitivity: Float = 0.7f
 
+        /**
+         * Number of player that supported
+         */
+        const val NUM_CONTROLLER_SUPPORT: Int = 2
+
         var screenX: Int = 0
         var screenY: Int = 0
 
@@ -80,14 +87,10 @@ class BBInput {
         var mouseDown: Boolean = false
         var pMouseDown: Boolean = false
 
-        var controller1Down: Boolean = false
-        var pController1Down: Boolean = false
+        var controllerDowns: Array<Boolean> = Array(NUM_CONTROLLER_SUPPORT, { false })
+        var pControllerDowns: Array<Boolean> = Array(NUM_CONTROLLER_SUPPORT, { false })
 
-        var controller2Down: Boolean = false
-        var pController2Down: Boolean = false
-
-        var controller1: Controller? = null
-        var controller2: Controller? = null
+        var controllers: Array<Controller?> = Array(NUM_CONTROLLER_SUPPORT, { null })
 
         var keys: Array<Boolean> = Array(ButtonKey.values().size, { false })
         var pkeys: Array<Boolean> = Array(ButtonKey.values().size, { false })
@@ -101,14 +104,20 @@ class BBInput {
         var controller2Keys: Array<Boolean> = Array(ControllerKey.values().size, { false })
         var pController2Keys: Array<Boolean> = Array(ControllerKey.values().size, { false })
 
+        // convenient methods to get which controller from total number of controllers supported
+        fun controller1(): Controller? { return controllers[0] }
+        fun controller2(): Controller? { return controllers[1] }
 
         fun update() {
-            // update previous down
+            // update previous and current down for general
             pdown = down
             pMouseDown = mouseDown
-            pController1Down = controller1Down
-            pController2Down = controller2Down
 
+            for (i in 0..NUM_CONTROLLER_SUPPORT-1) {
+                pControllerDowns[i] = controllerDowns[i]
+            }
+
+            // update previous and current down for specific keys
             for (i in 0..ButtonKey.values().size - 1) {
                 pkeys[i] = keys[i]
             }
@@ -179,12 +188,7 @@ class BBInput {
             return mouseDown
         }
         fun isControllerDown(cindex: Int): Boolean {
-            if (cindex == 0) {
-                return controller1Down
-            }
-            else {
-                return controller2Down
-            }
+            return controllerDowns[cindex]
         }
 
         /** isPressed **/
@@ -195,12 +199,7 @@ class BBInput {
             return mouseDown && !pMouseDown
         }
         fun isControllerPressed(cindex: Int): Boolean {
-            if (cindex == 0) {
-                return controller1Down && !pController1Down
-            }
-            else {
-                return controller2Down && !pController2Down
-            }
+            return controllerDowns[cindex] && !pControllerDowns[cindex]
         }
 
         /** isReleased **/
@@ -211,11 +210,26 @@ class BBInput {
             return pMouseDown && !mouseDown
         }
         fun isControllerReleased(cindex: Int): Boolean {
-            if (cindex == 0) {
-                return pController1Down && !controller1Down
+            return pControllerDowns[cindex] && !controllerDowns[cindex]
+        }
+
+        /**
+         * It will nullify all current reference controller, then set all current detected
+         * controllers back again.
+         *
+         * Use this to sync controllers at any given time.
+         */
+        fun syncControllers(listener: ControllerListener) {
+
+            // null all current controllers
+            for (i in 0..controllers.size-1) {
+                controllers[i] = null
             }
-            else {
-                return pController2Down && !controller2Down
+
+            // loop to set all detected controllers
+            Controllers.getControllers().forEachIndexed { i, ct ->
+                ct.addListener(listener)
+                controllers[i] = ct
             }
         }
     }

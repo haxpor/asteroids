@@ -69,7 +69,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
         // there's still an issue with this as disconnected() didn't get called for BBInputProcessor
         // wait to be fixed
-        val controller = BBInput.controller1
+        val controller = BBInput.controller1()
 
         // turn left
         if (( (BBInput.isButtonDown(BBInput.ButtonKey.LEFT)) ||
