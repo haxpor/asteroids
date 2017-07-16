@@ -46,8 +46,11 @@ class HighScore(gsm: GameStateManager): GameState(gsm) {
     }
 
     override fun handleInput(dt: Float) {
+        val gamepad = BBInput.controller1
+
         if (BBInput.isPressed(BBInput.BUTTON_ENTER) ||
-                BBInput.isPressed(BBInput.BUTTON_ESCAPE)) {
+                BBInput.isPressed(BBInput.BUTTON_ESCAPE) ||
+                (gamepad != null && BBInput.isControllerPressed(0, BBInput.CONTROLLER_BUTTON_A))) {
             gsm.setState(Mainmenu(gsm))
         }
     }

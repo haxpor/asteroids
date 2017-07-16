@@ -75,7 +75,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
         val gamepad = BBInput.controller1
 
         // turn left
-        if (( (BBInput.isDown(BBInput.BUTTON_LEFT) && gamepad == null) ||
+        if (( (BBInput.isDown(BBInput.BUTTON_LEFT)) ||
                 (gamepad != null && gamepad.getAxis(Xbox.L_STICK_HORIZONTAL_AXIS) < -Settings.GAMEPAD_DEADZONE_VALUE) ||
                 (gamepad != null && BBInput.isControllerDown(0, BBInput.CONTROLLER_BUTTON_LEFT))) &&
                 !player.isHit) {
@@ -86,7 +86,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
         }
 
         // turn right
-        if (( (BBInput.isDown(BBInput.BUTTON_RIGHT) && gamepad == null) ||
+        if (( (BBInput.isDown(BBInput.BUTTON_RIGHT)) ||
                 (gamepad != null && gamepad.getAxis(Xbox.L_STICK_HORIZONTAL_AXIS) > Settings.GAMEPAD_DEADZONE_VALUE) ||
                 (gamepad != null && BBInput.isControllerDown(0, BBInput.CONTROLLER_BUTTON_RIGHT))) &&
                 !player.isHit) {
@@ -97,7 +97,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
         }
 
         // go forward
-        if (( (BBInput.isDown(BBInput.BUTTON_UP) && gamepad == null) ||
+        if (( (BBInput.isDown(BBInput.BUTTON_UP)) ||
                 (gamepad != null && BBInput.isControllerDown(0, BBInput.CONTROLLER_BUTTON_A)) ||
                 (gamepad != null && BBInput.isControllerDown(0, BBInput.CONTROLLER_BUTTON_UP))) &&
                 !player.isHit) {
@@ -108,7 +108,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
         }
 
         // shoot
-        if (( (BBInput.isPressed(BBInput.BUTTON_SPACE) && gamepad == null) ||
+        if (( (BBInput.isPressed(BBInput.BUTTON_SPACE)) ||
                 (gamepad != null && BBInput.isControllerPressed(0, BBInput.CONTROLLER_BUTTON_B))) &&
                 !player.isHit) {
             player.shoot()
