@@ -88,7 +88,7 @@ class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
                 (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.L_ANALOG_LEFT)) ||
                 (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_LEFT)) || // quardrant 2
                 (touchPad != null && (touchPadAngle > MathUtils.PI/2f && touchPadAngle < MathUtils.PI)) ||  // quardrant 3
-                (touchPad != null && (touchPadAngle < 0f && touchPadAngle > -MathUtils.PI/2f))) &&
+                (touchPad != null && (touchPadAngle > -MathUtils.PI && touchPadAngle < -MathUtils.PI/2f))) &&
                 !player.isHit) {
             player.left = true
         }
@@ -101,7 +101,7 @@ class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
                 (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.L_ANALOG_RIGHT)) ||
                 (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_RIGHT)) ||
                 (touchPad != null && (touchPadAngle > 0f && touchPadAngle < MathUtils.PI/2f)) ||    // quardrant 1
-                (touchPad != null && (touchPadAngle < -MathUtils.PI/2f && touchPadAngle > -MathUtils.PI*2f))) &&    // quardrant 4
+                (touchPad != null && (touchPadAngle > -MathUtils.PI && touchPadAngle < 0f))) &&    // quardrant 4
                 !player.isHit) {
             player.right = true
         }
@@ -535,10 +535,12 @@ class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
 
     override fun onTouchPadTouch(pad: TouchPad, radians: Float) {
         touchPadAngle = radians
+        println("touch $radians")
     }
 
     override fun onTouchPadCancel(pad: TouchPad, lastKnownRadians: Float) {
         // set to 0f radian as we don't need its lastKnownRadians
         touchPadAngle = 0f
+        println("touch 0f")
     }
 }
