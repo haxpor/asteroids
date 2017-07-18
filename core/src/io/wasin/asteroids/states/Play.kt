@@ -80,10 +80,11 @@ class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
             }
 
             // thruster button
-            thrusterTouchButton = TouchButton(hudCam.viewportWidth - 30f*3 - 30f, 69f, 30f, "T", font, hudViewport)
+            val buttonRadius = 45f
+            thrusterTouchButton = TouchButton(hudCam.viewportWidth - buttonRadius*3 - 30f, 69f, buttonRadius, "T", font, hudViewport)
 
             // shoot button
-            shootTouchButton = TouchButton(hudCam.viewportWidth - 30f - 30f, 168f, 30f, "S", font, hudViewport)
+            shootTouchButton = TouchButton(hudCam.viewportWidth - buttonRadius - 30f, 168f, buttonRadius, "S", font, hudViewport)
         }
     }
 
