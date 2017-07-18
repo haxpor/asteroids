@@ -32,6 +32,7 @@ class TouchButton(x: Float, y: Float, radius: Float, text: String, font: BitmapF
     private var cachedCenterPos: Vector3 = Vector3(x, y, 0f)
     private var touchId: Int? = null
     private var isFirstTouch: Boolean = true
+    private var isTouched: Boolean = false
 
     fun isDown(): Boolean {
         return checkInput(false)
@@ -59,22 +60,26 @@ class TouchButton(x: Float, y: Float, radius: Float, text: String, font: BitmapF
                     // save this touch id
                     touchId = i
                     isFirstTouch = false
+                    isTouched = true
 
-                    return true
+                    return isTouched
                 }
                 // check down state for only down approach
                 else if (touchedInBound && !forPressed && !isFirstTouch && touchId != null && touchId == i) {
-                    return true
+                    isTouched = true
+                    return isTouched
                 }
                 // check to return untouched (false) for consecutive touch for pressed state
                 // as it's already touched
                 else if (touchedInBound && forPressed && !isFirstTouch && touchId != null && touchId == i) {
-                    return false
+                    isTouched = false
+                    return isTouched
                 }
                 // if touch outside of the bound, then false
                 // note: checking touch id is still important as we don't want to cancel other touches
                 else if (touchId != null && touchId == i) {
-                    return false
+                    isTouched = false
+                    return isTouched
                 }
             }
         }
@@ -85,6 +90,7 @@ class TouchButton(x: Float, y: Float, radius: Float, text: String, font: BitmapF
                 // clear touch id, and reset states
                 touchId = null
                 isFirstTouch = true
+                isTouched = false
             }
         }
 
@@ -92,9 +98,10 @@ class TouchButton(x: Float, y: Float, radius: Float, text: String, font: BitmapF
     }
 
     fun render(sb: SpriteBatch, sr: ShapeRenderer) {
+        // ShapeRenderer
         // render lines
         val oldColor = sr.color
-        sr.color = Color.WHITE
+        sr.color = if (isTouched) Color.GRAY else Color.WHITE
 
         sr.begin(ShapeRenderer.ShapeType.Line)
         sr.circle(x, y, radius)
@@ -102,6 +109,7 @@ class TouchButton(x: Float, y: Float, radius: Float, text: String, font: BitmapF
 
         sr.color = oldColor
 
+        // SpriteBatch
         // render text
         sb.begin()
         font.draw(sb, glyph, x - glyph.width/2f, y + glyph.height/2f)
