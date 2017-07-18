@@ -39,15 +39,15 @@ class Game : ApplicationAdapter() {
         playerSaveFileManager.sync(Settings.TOTAL_HIGH_SCORES_RECORD)
 
         // load any resource here...
-        res.loadSound("sounds/explode.ogg", "explode")
-        res.loadSound("sounds/extralife.ogg", "extralife")
-        res.loadSound("sounds/largesaucer.ogg", "largesaucer")
+        res.loadSound("sounds/explode.wav", "explode")
+        res.loadSound("sounds/extralife.wav", "extralife")
+        res.loadSound("sounds/largesaucer.wav", "largesaucer")
         res.loadSound("sounds/pulsehigh.wav", "pulsehigh")
         res.loadSound("sounds/pulselow.wav", "pulselow")
-        res.loadSound("sounds/saucershoot.ogg", "saucershoot")
-        res.loadSound("sounds/shoot.ogg", "shoot")
-        res.loadSound("sounds/smallsaucer.ogg", "smallsaucer")
-        res.loadSound("sounds/thruster.ogg", "thruster")
+        res.loadSound("sounds/saucershoot.wav", "saucershoot")
+        res.loadSound("sounds/shoot.wav", "shoot")
+        res.loadSound("sounds/smallsaucer.wav", "smallsaucer")
+        res.loadSound("sounds/thruster.wav", "thruster")
 
         // sync controllers
         BBInput.syncControllers(Gdx.input.inputProcessor as ControllerListener)
