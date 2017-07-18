@@ -101,7 +101,7 @@ project(":ios-moe") {
         compile "com.badlogicgames.gdx:gdx-backend-moe:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
     }
 }
 
