@@ -40,8 +40,11 @@ class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
     private var font: BitmapFont
     private var bgMusic: SimulatedBgMusic = SimulatedBgMusic()
 
-    private var touchPad: TouchPad? = null  // only for Android, or iOS
+    // applicable for only for Android, or iOS
+    private var touchPad: TouchPad? = null
     private var touchPadAngle: Float = 0.0f // in radians
+    private var thrusterTouchButton: TouchButton? = null
+    private var shootTouchButton: TouchButton? = null
 
     companion object {
         const val SAFE_SPAWN_DIST: Float = 100f
@@ -71,9 +74,16 @@ class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
         // only for Android, or iOS
         if (Gdx.app.type == Application.ApplicationType.iOS ||
                 Gdx.app.type == Application.ApplicationType.Android) {
+            // touch pad
             touchPad = TouchPad(120f, 120f, 90f, 30f)?.also {
                 it.listener = this
             }
+
+            // thruster button
+            thrusterTouchButton = TouchButton(hudCam.viewportWidth - 30f*3 - 30f, 69f, 30f, "T", font, hudViewport)
+
+            // shoot button
+            shootTouchButton = TouchButton(hudCam.viewportWidth - 30f - 30f, 168f, 30f, "S", font, hudViewport)
         }
     }
 
@@ -112,7 +122,8 @@ class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
         // go forward
         if (( (BBInput.isButtonDown(BBInput.ButtonKey.UP)) ||
                 (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.A)) ||
-                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_UP))) &&
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_UP)) ||
+                (thrusterTouchButton != null && thrusterTouchButton!!.isDown())) &&
                 !player.isHit) {
             player.up = true
         }
@@ -122,7 +133,8 @@ class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
 
         // shoot
         if (( (BBInput.isButtonPressed(BBInput.ButtonKey.SPACE)) ||
-                (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.B))) &&
+                (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.B)) ||
+                (shootTouchButton != null && shootTouchButton!!.isPressed())) &&
                 !player.isHit) {
             player.shoot()
         }
@@ -265,6 +277,12 @@ class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
 
         touchPad?.let {
             it.render(sr)
+        }
+        thrusterTouchButton?.let {
+            it.render(sb, sr)
+        }
+        shootTouchButton?.let {
+            it.render(sb, sr)
         }
 
         // lives
@@ -535,12 +553,10 @@ class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
 
     override fun onTouchPadTouch(pad: TouchPad, radians: Float) {
         touchPadAngle = radians
-        println("touch $radians")
     }
 
     override fun onTouchPadCancel(pad: TouchPad, lastKnownRadians: Float) {
         // set to 0f radian as we don't need its lastKnownRadians
         touchPadAngle = 0f
-        println("touch 0f")
     }
 }
