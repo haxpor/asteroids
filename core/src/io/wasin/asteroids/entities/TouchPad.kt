@@ -36,6 +36,7 @@ class TouchPad(x: Float, y: Float, radius: Float, innerRadius: Float) : UIObject
     private var cachedCenterPos: Vector3 = Vector3(x, y, 0f)
     private var touchPadTouchId: Int? = null
     private var isLerpBackToCenter: Boolean = false
+    private var isFirstTouch: Boolean = true
 
     fun update(dt: Float, viewport: Viewport) {
 
@@ -51,7 +52,7 @@ class TouchPad(x: Float, y: Float, radius: Float, innerRadius: Float) : UIObject
                 isTouchedWithinTouchPad = cachedCenterPos.dst(location) < this.radius
 
                 // touch within touch pad to register touch
-                if (isTouchedWithinTouchPad && Gdx.input.justTouched()) {
+                if (isTouchedWithinTouchPad && isFirstTouch) {
                     // save this touch id
                     touchPadTouchId = i
 
@@ -59,6 +60,7 @@ class TouchPad(x: Float, y: Float, radius: Float, innerRadius: Float) : UIObject
                     touchLocation = location
 
                     isLerpBackToCenter = false
+                    isFirstTouch = false
 
                     // send in listener
                     listener?.let {
@@ -69,7 +71,7 @@ class TouchPad(x: Float, y: Float, radius: Float, innerRadius: Float) : UIObject
                 }
                 // keep track of position changes within touchpad
                 else if (isTouchedWithinTouchPad && touchPadTouchId != null && touchPadTouchId == i &&
-                         !Gdx.input.justTouched()) {
+                         !isFirstTouch) {
                     // save touch location
                     touchLocation = location
 
@@ -85,7 +87,7 @@ class TouchPad(x: Float, y: Float, radius: Float, innerRadius: Float) : UIObject
                 // otherwise touch outside, bound the location to be within touch pad
                 // also make sure it's the same touch id that initially initiates this touch process
                 else if (!isTouchedWithinTouchPad && touchPadTouchId != null && touchPadTouchId == i &&
-                        !Gdx.input.justTouched()){
+                        !isFirstTouch){
 
                     // save touch location
                     touchLocation = location
@@ -111,11 +113,13 @@ class TouchPad(x: Float, y: Float, radius: Float, innerRadius: Float) : UIObject
 
         // try to lerp inner circle back to center location
         // note: pointer index is preserved for touched one
-        touchPadTouchId?.let {
-            if (!Gdx.input.isTouched(it)) {
-                // clear touch id
+        if (touchPadTouchId != null) {
+            if (!Gdx.input.isTouched(touchPadTouchId!!)) {
+                // clear touch id and reset states
                 touchPadTouchId = null
                 isLerpBackToCenter = true
+                isTouchedWithinTouchPad = false
+                isFirstTouch = true
 
                 listener?.let {
                     it.onTouchPadCancel(this, getTouchAngle(touchLocation.x, touchLocation.y))
