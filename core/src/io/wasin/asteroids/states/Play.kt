@@ -1,5 +1,6 @@
 package io.wasin.asteroids.states
 
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -15,7 +16,7 @@ import io.wasin.asteroids.handlers.SimulatedBgMusic
 /**
  * Created by haxpor on 6/16/17.
  */
-class Play(gsm: GameStateManager): GameState(gsm){
+class Play(gsm: GameStateManager): GameState(gsm), TouchPad.Touchable {
 
     private var sr: ShapeRenderer = ShapeRenderer()
     private var player: Player = Player(4)
@@ -38,6 +39,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
     private var font: BitmapFont
     private var bgMusic: SimulatedBgMusic = SimulatedBgMusic()
+
+    private var touchPad: TouchPad? = null  // only for Android, or iOS
+    private var touchPadAngle: Float = 0.0f // in radians
 
     companion object {
         const val SAFE_SPAWN_DIST: Float = 100f
@@ -63,6 +67,14 @@ class Play(gsm: GameStateManager): GameState(gsm){
         flyingSaucerPool = FlyingSaucerPool(1, player, camViewport)
 
         spawnAsteroids()
+
+        // only for Android, or iOS
+        if (Gdx.app.type == Application.ApplicationType.iOS ||
+                Gdx.app.type == Application.ApplicationType.Android) {
+            touchPad = TouchPad(120f, 120f, 90f, 30f)?.also {
+                it.listener = this
+            }
+        }
     }
 
     override fun handleInput(dt: Float) {
@@ -74,7 +86,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
         // turn left
         if (( (BBInput.isButtonDown(BBInput.ButtonKey.LEFT)) ||
                 (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.L_ANALOG_LEFT)) ||
-                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_LEFT))) &&
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_LEFT)) || // quardrant 2
+                (touchPad != null && (touchPadAngle > MathUtils.PI/2f && touchPadAngle < MathUtils.PI)) ||  // quardrant 3
+                (touchPad != null && (touchPadAngle < 0f && touchPadAngle > -MathUtils.PI/2f))) &&
                 !player.isHit) {
             player.left = true
         }
@@ -85,7 +99,9 @@ class Play(gsm: GameStateManager): GameState(gsm){
         // turn right
         if (( (BBInput.isButtonDown(BBInput.ButtonKey.RIGHT)) ||
                 (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.L_ANALOG_RIGHT)) ||
-                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_RIGHT))) &&
+                (controller != null && BBInput.isControllerDown(0, BBInput.ControllerKey.DPAD_RIGHT)) ||
+                (touchPad != null && (touchPadAngle > 0f && touchPadAngle < MathUtils.PI/2f)) ||    // quardrant 1
+                (touchPad != null && (touchPadAngle < -MathUtils.PI/2f && touchPadAngle > -MathUtils.PI*2f))) &&    // quardrant 4
                 !player.isHit) {
             player.right = true
         }
@@ -114,6 +130,7 @@ class Play(gsm: GameStateManager): GameState(gsm){
 
     override fun update(dt: Float) {
         handleInput(dt)
+        touchPad?.let { it.update(dt, hudViewport) }
 
         // if all asteroids are destroyed then progress to next level
         if (asteroids.count() == 0) {
@@ -245,6 +262,10 @@ class Play(gsm: GameStateManager): GameState(gsm){
         sb.projectionMatrix = hudCam.combined
         sr.projectionMatrix = hudCam.combined
         hudViewport.apply(true)
+
+        touchPad?.let {
+            it.render(sr)
+        }
 
         // lives
         Player.beginBatchRender(sr)
@@ -510,5 +531,14 @@ class Play(gsm: GameStateManager): GameState(gsm){
             particle.spawn(x, y)
             particles.add(particle)
         }
+    }
+
+    override fun onTouchPadTouch(pad: TouchPad, radians: Float) {
+        touchPadAngle = radians
+    }
+
+    override fun onTouchPadCancel(pad: TouchPad, lastKnownRadians: Float) {
+        // set to 0f radian as we don't need its lastKnownRadians
+        touchPadAngle = 0f
     }
 }
