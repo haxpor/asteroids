@@ -253,9 +253,9 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
 
     override fun dispose() {
         titleFont.dispose()
-        sr?.let { it.dispose() }
-        subtitleFont?.let { it.dispose() }
-        smallUIFont?.let { it.dispose() }
-        inputNameFont?.let { it.dispose() }
+        sr?.dispose()
+        subtitleFont?.dispose()
+        smallUIFont?.dispose()
+        inputNameFont?.dispose()
     }
 }
