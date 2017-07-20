@@ -15,6 +15,13 @@ Captured on iOS (noted the degraded framerate for gif, it's smooth in real.)
 ![controller support](http://i.imgur.com/O2sSXq1.gif)
 ![high score controller interaction](http://i.imgur.com/of6n3Cx.gif)
 
+# Video in Action
+
+Click on image to watch video.
+
+[![desktop gameplay video](http://i.imgur.com/uLRDqkM.png)](https://www.youtube.com/watch?v=25N9RvHNJbQ)
+[![mobile gameplay video](http://i.imgur.com/XZ3b3wQ.png)](https://www.youtube.com/watch?v=nHy8_HYIExI)
+
 # Changes, Additional Features, and Improvements
 
 Ported work included followings
