@@ -1,5 +1,7 @@
 package io.wasin.asteroids.states
 
+import com.apple.eawt.ApplicationBeanInfo
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -7,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import io.wasin.asteroids.data.PlayerScore
+import io.wasin.asteroids.entities.TouchButton
 import io.wasin.asteroids.handlers.BBInput
 import io.wasin.asteroids.handlers.GameStateManager
 import io.wasin.asteroids.handlers.Settings
@@ -27,12 +30,19 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
 
     // if input score can be regarded as one of high scores
     // then these will be initialized
-    private var sr: ShapeRenderer? = null
     private var subtitleFont: BitmapFont? = null
     private var inputNameFont: BitmapFont? = null
     private var subtitleGlyph: GlyphLayout? = null
     private var inputNameGlyph: GlyphLayout? = null
     private var inputName: StringBuilder? = null
+
+    // only for Android, and iOS
+    private var sr: ShapeRenderer? = null
+    private var smallUIFont: BitmapFont? = null
+    private var up: TouchButton? = null
+    private var down: TouchButton? = null
+    private var switch: TouchButton? = null
+    private var ok: TouchButton? = null
 
     init {
         val fontGen = FreeTypeFontGenerator(Gdx.files.internal("fonts/Hyperspace Bold.ttf"))
@@ -51,9 +61,16 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
             regardedAsOneOfHighScores = true
         }
 
+        // check if running on mobile platform
+        val isAndroidOriOS = Gdx.app.type == Application.ApplicationType.iOS || Gdx.app.type == Application.ApplicationType.Android
+
+        // create shape renderer is conditions are met
+        if (isAndroidOriOS || regardedAsOneOfHighScores) {
+            sr = ShapeRenderer()
+        }
+
         // initialize variables if needed
         if (regardedAsOneOfHighScores) {
-            sr = ShapeRenderer()
 
             subtitleFont = fontGen.generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
                 it.size = 35
@@ -73,6 +90,34 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
             subtitleGlyph = GlyphLayout(subtitleFont, "New High Score: $score")
             inputName = StringBuilder("AAA")
             inputNameGlyph = GlyphLayout(subtitleFont, inputName)
+
+            // only for Android and iOS
+            if (isAndroidOriOS) {
+
+                // touch buttons
+                val radius = 35f
+                val yPos = hudCam.viewportHeight/2f + 70f - titleGlyph.height/2f - 30f -
+                        subtitleGlyph!!.height/2f - inputNameGlyph!!.height/2f - 35f - radius*2f - 25f
+
+                up = TouchButton(hudCam.viewportWidth/2f - radius*2f - 5f, yPos,
+                        radius, "+", inputNameFont!!, hudViewport)
+                down = TouchButton(hudCam.viewportWidth/2f + radius*2f + 5f, yPos,
+                        radius, "-", inputNameFont!!, hudViewport)
+                switch = TouchButton(hudCam.viewportWidth/2f, yPos,
+                        radius, "Sw", inputNameFont!!, hudViewport)
+            }
+        }
+
+        // ok button for Android, and iOS
+        if (isAndroidOriOS) {
+            smallUIFont = fontGen.generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
+                it.size = 20
+            })
+
+            val okRadius = 25f
+            ok = TouchButton(hudCam.viewportWidth - okRadius - 10f,
+                    hudCam.viewportHeight - okRadius - 10f, okRadius,
+                    "ok", smallUIFont!!, hudViewport)
         }
 
         fontGen.dispose()
@@ -92,7 +137,8 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
             }
             if (BBInput.isButtonPressed(BBInput.ButtonKey.RIGHT) ||
                     (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.DPAD_RIGHT)) ||
-                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.L_ANALOG_RIGHT))) {
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.L_ANALOG_RIGHT)) ||
+                    (switch != null && switch!!.isPressed())) {
                 currentNameInputCharacterIndex = (currentNameInputCharacterIndex + 1) % 3
             }
 
@@ -100,14 +146,16 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
             // possible character in decimal as in ascii table is 65-90 which is A-Z which is 26 characters in total
             if (BBInput.isButtonPressed(BBInput.ButtonKey.UP) ||
                     (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.DPAD_UP)) ||
-                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.L_ANALOG_UP))) {
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.L_ANALOG_UP)) ||
+                    (up != null && up!!.isPressed())) {
                 inputName!![currentNameInputCharacterIndex] = (((inputName!![currentNameInputCharacterIndex].toInt() - 65 + 1) % 26) + 65).toChar()
                 // update glyph
                 inputNameGlyph!!.setText(inputNameFont, inputName)
             }
             if (BBInput.isButtonPressed(BBInput.ButtonKey.DOWN) ||
                     (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.DPAD_DOWN)) ||
-                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.L_ANALOG_DOWN))) {
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.L_ANALOG_DOWN)) ||
+                    (down != null && down!!.isPressed())) {
                 inputName!![currentNameInputCharacterIndex] = (((inputName!![currentNameInputCharacterIndex].toInt() - 65 - 1 + 26) % 26) + 65).toChar()
                 // update glyph
                 inputNameGlyph!!.setText(inputNameFont, inputName)
@@ -115,7 +163,8 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
 
             // submit
             if (BBInput.isButtonPressed(BBInput.ButtonKey.ENTER) ||
-                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.A))) {
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.A)) ||
+                    (ok != null && ok!!.isPressed())) {
                 // update a new score, and write to file immediately
                 game.playerSaveFileManager.updateWithNewPlayerScore(PlayerScore(inputName.toString(), score), true)
                 // go back to mainmenu
@@ -125,7 +174,8 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
         else {
             if (BBInput.isButtonPressed(BBInput.ButtonKey.ENTER) ||
                     BBInput.isMousePressed(BBInput.MouseKey.LEFT) ||
-                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.A))) {
+                    (controller != null && BBInput.isControllerPressed(0, BBInput.ControllerKey.A)) ||
+                    (ok != null && ok!!.isPressed())) {
                 // go back to mainmenu
                 gsm.setState(Mainmenu(gsm))
             }
@@ -159,6 +209,15 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
                     hudCam.viewportHeight/2f + 70f - titleGlyph.height/2f - 30f -
                             subtitleGlyph!!.height/2f - inputNameGlyph!!.height/2f - 35f)
             sb.end()
+
+            // touch buttons
+            sr?.let {
+                val _sr = it
+
+                up?.let { it.render(sb, _sr) }
+                down?.let { it.render(sb, _sr) }
+                switch?.let { it.render(sb, _sr) }
+            }
         }
         else {
             sb.end()
@@ -178,6 +237,14 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
             sr!!.line(xPos, yPos, xPos + singleCharTextFontWidth, yPos)
             sr!!.end()
         }
+
+        // render ok button
+        ok?.let {
+            val _ok = it
+            sr?.let {
+                _ok.render(sb, it)
+            }
+        }
     }
 
     override fun resize_user(width: Int, height: Int) {
@@ -188,6 +255,7 @@ class GameOver(score: Long, gsm: GameStateManager): GameState(gsm) {
         titleFont.dispose()
         sr?.let { it.dispose() }
         subtitleFont?.let { it.dispose() }
+        smallUIFont?.let { it.dispose() }
         inputNameFont?.let { it.dispose() }
     }
 }

@@ -3,7 +3,6 @@ package io.wasin.asteroids
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.ControllerListener
-import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.wasin.asteroids.handlers.*
 import io.wasin.asteroids.states.Mainmenu
