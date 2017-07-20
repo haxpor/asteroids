@@ -10,9 +10,10 @@ Kotlin port of ForeignGuyMike's Asteroids project with changes, additional featu
 Captured on iOS (noted the degraded framerate for gif, it's smooth in real.)
 ![iOS gameplay gif](https://media.giphy.com/media/54r3o7nmXqhXi/giphy.gif)
 
-## Desktop build with controller support
+## Controller support on Desktop
 
 ![controller support](http://i.imgur.com/O2sSXq1.gif)
+![high score controller interaction](http://i.imgur.com/of6n3Cx.gif)
 
 # Changes, Additional Features, and Improvements
 
