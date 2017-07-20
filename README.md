@@ -26,10 +26,10 @@ Click on image to watch video.
 
 Ported work included followings
 
-* Works with Desktop, iOS, and Android
+* Works with Desktop, iOS (via MOE), and Android
 * Ported completely to Kotlin utilizing several of Kotlin language features
 * iOS, and Android build with control (touchpad and etc) suitable for mobile
-* Controller support for desktop
+* Controller support for desktop; but fixed to use Xbox360 layout. If you use another brand, you have to edit code for button mapping.
 * Continued with initial intention of the project by using non-texture for game object, only shape-based via `ShapeRenderer`. Only texture used are bitmap which is dynamically generated in run time from `.ttf` font file via `BitmapFont`.
 * Avoid using `java.awt.geom` classes which are `Line2D`, and `Point2D` classes which are not supported on Android by creating a wrapper class with functionality intended to be used in this project; just hold the data.
 * Performance improvements
