@@ -1,5 +1,18 @@
+<a href="https://github.com/haxpor/donate"><img src="https://img.shields.io/badge/$-donate-ff69b4.svg?maxAge=2592000&amp;style=flat" alt="donate"></a>
+
 # asteroids
 Kotlin port of ForeignGuyMike's Asteroids project with changes, additional features and improvements.
+
+# Gifs in Action
+
+## Gameplay on mobile
+
+Captured on iOS (noted the degraded framerate for gif, it's smooth in real.)
+![iOS gameplay gif](https://media.giphy.com/media/54r3o7nmXqhXi/giphy.gif)
+
+## Desktop build with controller support
+
+![controller support](http://i.imgur.com/O2sSXq1.gif)
 
 # Changes, Additional Features, and Improvements
 
@@ -16,18 +29,6 @@ Ported work included followings
     * Object pools are used to avoid creating new object every time
     * Proper clearing native resource via calling `dispose()` properly
     * [BBInput](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/handlers/BBInput.kt), and [BBInputProcessor](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/handlers/BBInputProcessor.kt) are iterated from previous projects ([BlockBunny](https://github.com/haxpor/blockbunny), and [OMO](https://github.com/haxpor/omo)) and refactored to represent good enough and working class to handle input all across the game. It supports keyboard, mouse, and controllers
-
-
-# Gifs in Action
-
-## Gameplay on mobile
-
-Captured on iOS (noted the degraded framerate for gif, it's smooth in real.)
-![iOS gameplay gif](https://media.giphy.com/media/54r3o7nmXqhXi/giphy.gif)
-
-## Desktop build with controller support
-
-![controller support](https://media.giphy.com/media/mqouIJtbhh5VS/giphy.gif)
 
 # Notice
 
