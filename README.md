@@ -32,11 +32,11 @@ Ported work included followings
 * Controller support for desktop; but fixed to use Xbox360 layout. If you use another brand, you have to edit code for button mapping.
 * Continued with initial intention of the project by using non-texture for game object, only shape-based via `ShapeRenderer`. Only texture used are bitmap which is dynamically generated in run time from `.ttf` font file via `BitmapFont`.
 * Avoid using `java.awt.geom` classes which are `Line2D`, and `Point2D` classes which are not supported on Android by creating a wrapper class with functionality intended to be used in this project; just hold the data.
+* [BBInput](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/handlers/BBInput.kt), and [BBInputProcessor](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/handlers/BBInputProcessor.kt) are iterated from previous projects ([BlockBunny](https://github.com/haxpor/blockbunny), and [OMO](https://github.com/haxpor/omo)) and refactored to represent much better class to handle input all across the game. It supports keyboard, mouse, and controllers
 * Performance improvements
     * Improved draw call over the same type of object but with multiple instances. See [IBatchShapeRenderable](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/interfaces/IBatchShapeRenderable.kt) and [IBatchWraperShapeRenderable](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/interfaces/IBatchWrapperShapeRenderable.kt).
     * Object pools are used to avoid creating new object every time
     * Proper clearing native resource via calling `dispose()` properly
-    * [BBInput](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/handlers/BBInput.kt), and [BBInputProcessor](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/handlers/BBInputProcessor.kt) are iterated from previous projects ([BlockBunny](https://github.com/haxpor/blockbunny), and [OMO](https://github.com/haxpor/omo)) and refactored to represent good enough and working class to handle input all across the game. It supports keyboard, mouse, and controllers
 
 # Notice
 
