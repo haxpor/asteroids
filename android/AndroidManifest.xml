@@ -2,16 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.wasin.asteroids" >
 
-    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="25" />
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
+        android:isGame="true"
+        android:appCategory="game"
         android:theme="@style/GdxTheme" >
         <activity
             android:name="io.wasin.asteroids.AndroidLauncher"
-            android:label="@string/app_name" 
+            android:label="@string/app_name"
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
             <intent-filter>

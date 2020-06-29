@@ -1,6 +1,5 @@
 package io.wasin.asteroids.states
 
-import com.apple.eawt.ApplicationBeanInfo
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
