@@ -26,9 +26,9 @@ Click on image to watch video.
 
 Ported work included followings
 
-* Works with Desktop, iOS (via MOE), and Android
+* Works with Desktop, ~~iOS (via MOE)~~ (as MOE support was removed in libgdx), and Android
 * Ported completely to Kotlin utilizing several of Kotlin language features
-* iOS, and Android build with control (touchpad and etc) suitable for mobile
+* Mobile build with control (touchpad and etc) suitable for mobile
 * Controller support for desktop; but fixed to use Xbox360 layout. If you use another brand, you have to edit code for button mapping.
 * Continued with initial intention of the project by using non-texture for game object, only shape-based via `ShapeRenderer`. Only texture used are bitmap which is dynamically generated in run time from `.ttf` font file via `BitmapFont`.
 * Avoid using `java.awt.geom` classes which are `Line2D`, and `Point2D` classes which are not supported on Android by creating a wrapper class with functionality intended to be used in this project; just hold the data.
@@ -43,7 +43,7 @@ Ported work included followings
 * Better utilize more lambda functions of Kotlin when necessary through out the project especially in [Play](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/states/Play.kt)
 * [BBInput](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/handlers/BBInput.kt) and [BBInputProcessor](https://github.com/haxpor/asteroids/blob/master/core/src/io/wasin/asteroids/handlers/BBInputProcessor.kt) handles all input from keyboard, mouse, and controller (with up to N players, set in source but this game is single player)
 * Properly handle to clear native resource via calling `dispose()`
-* Some screens check if game is running on Android, or iOS then dynamically add support for mobile interaction
+* Some screens check if game is running on mobile platform then dynamically add support for mobile interaction
 
 # License
 [MIT](https://github.com/haxpor/asteroids/blob/master/LICENSE), Wasin Thonkaew
